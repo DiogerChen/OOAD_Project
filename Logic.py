@@ -22,12 +22,13 @@ class Game:
         id_counter = 0
         for t in shu_pai:
             for i in range(1, 10):
-                card = Card(t, i, id_counter)
-                self.deck.append(card)
-                self.id_to_card[id_counter] = card
-                id_counter += 1
+                for j in range(4):
+                    card = Card(t, i, id_counter)
+                    self.deck.append(card)
+                    self.id_to_card[id_counter] = card
+                    id_counter += 1
         for t in zi_pai:
-            for i in range(1, 5):
+            for i in range(4):
                 card = Card(t, 0, id_counter)
                 self.deck.append(card)
                 self.id_to_card[id_counter] = card

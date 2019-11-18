@@ -1,5 +1,6 @@
 from Logic import *
-#让一个人摸13张牌，并与一张新抽牌一起检验能否吃碰杠
+
+# 初始化一个游戏并让一个人摸13张牌，并与一张新抽牌一起检验能否吃碰杠
 game = Game('a123', 'A', 'B', 'C', 'D')
 for i in range(13):
     game.player1.recieveCard(game.popCard())
