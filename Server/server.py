@@ -22,6 +22,12 @@ class Echo(threading.Thread):
                 print('connection closed')
                 return
 
+    def sendMsg(self, msg):
+        '''self.conn.send(msg)
+        print('Send: ' + msg)'''
+        pass
+
+
 def echo():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(('10.17.79.87', 5555))

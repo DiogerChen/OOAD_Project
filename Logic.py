@@ -2,7 +2,6 @@ import random
 
 type_hash = {'wan': 0, 'tiao': 1, 'bin': 2, 'dong': 3, 'xi': 4, 'nan': 5, 'bei': 6, 'bai': 7, 'fa': 8, 'zhong': 9}
 
-
 class Game:
     def __init__(self, room_id, player1_nickname, player2_nickname, player3_nickname, player4_nickname):
         self.room_id = room_id
@@ -147,7 +146,7 @@ class Player:
         else:
             return False
 
-    def checkPen(self, discard):
+    def checkPeng(self, discard):
         penable = False
         same_num = 0
         first_two_same = [None, None]
@@ -161,7 +160,7 @@ class Player:
                 break
         return penable, first_two_same
 
-    def Pen(self, discard):
+    def Peng(self, discard):
         penable, first_two_same = self.checkPen(discard)
         if penable:
             self.hand.remove(first_two_same[0])
