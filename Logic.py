@@ -39,6 +39,13 @@ class Game:
         else:
             return None
 
+    def assignInitCard(self):
+        for i in range(13):
+            self.player1.hand.append(self.popCard())
+            self.player2.hand.append(self.popCard())
+            self.player3.hand.append(self.popCard())
+            self.player4.hand.append(self.popCard())
+
 
 class Card:
     def __init__(self, card_type, card_num, card_id):
@@ -51,7 +58,10 @@ class Card:
         if type_hash[self.card_type] != type_hash[other.card_type]:
             return type_hash[self.card_type] < type_hash[other.card_type]
         else:
-            return self.card_num < self.card_num
+            return self.card_num < other.card_num
+
+    def __str__(self):
+        return self.card_type + ' ' + str(self.card_num)
 
 
 class Player:
@@ -65,12 +75,42 @@ class Player:
     def recieveCard(self, received_card):
         self.hand.append(received_card)
 
-    def discardCard(self, discard):
+    def playCard(self, discard):
         self.hand.remove(discard)
         self.discard_area.append(discard)
 
+    def discardRandomCard(self):
+        discard = self.hand.pop(random.randint(0, len(self.hand) - 1))
+        self.discard_area.append(discard)
+        return discard
+
     def checkHu(self):
-        return False
+        result = False
+        self.hand.sort()
+        for c1 in self.hand:
+            for c2 in self.hand:
+                if c1 == c2:
+                    continue
+                elif c1.card_type == c2.card_type and c1.card_num == c2.card_num:
+                    # print(c1, c2)
+                    triple = []
+                    result = True
+                    for c in self.hand:
+                        if c != c1 and c != c2:
+                            triple.append(c)
+                        if len(triple) == 3:
+                            if triple[0].card_type == triple[1].card_type == triple[2].card_type and (
+                                    triple[0].card_num == triple[1].card_num == triple[2].card_num
+                                    or triple[0].card_num + 2 == triple[1].card_num + 1 == triple[2].card_num):
+                                # print(triple[0], triple[1], triple[2], 'triple success')
+                                triple = []
+                            else:
+                                # print(triple[0], triple[1], triple[2], 'triple failed')
+                                result = False
+                                break
+                    if result:
+                        return result
+        return result
 
     def Hu(self):
         pass
