@@ -6,14 +6,27 @@ type_hash = {'wan': 0, 'tiao': 1, 'bin': 2, 'dong': 3, 'xi': 4, 'nan': 5, 'bei':
 class Game:
     def __init__(self, room_id, player1_nickname, player2_nickname, player3_nickname, player4_nickname):
         self.room_id = room_id
-        self.player1 = Player(player1_nickname)
-        self.player2 = Player(player2_nickname)
-        self.player3 = Player(player3_nickname)
-        self.player4 = Player(player4_nickname)
+        self.player1 = Player(player1_nickname, 1)
+        self.player2 = Player(player2_nickname, 2)
+        self.player3 = Player(player3_nickname, 3)
+        self.player4 = Player(player4_nickname, 4)
+        self.original_player_list = [self.player1, self.player2, self.player3, self.player4]
+        self.remaining_player_list = [self.player1, self.player2, self.player3, self.player4]
         self.deck = None
         self.id_to_card = {}
+        self.id_to_player = {1: self.player1, 2: self.player2, 3: self.player3, 4: self.player4}
         self.createNewDeck()
         self.current_player = self.player1
+
+    def nextPlayer(self):
+        index = self.remaining_player_list.index(self.current_player)
+        if index == len(self.remaining_player_list) - 1:
+            return self.remaining_player_list[0]
+        else:
+            return self.remaining_player_list[index + 1]
+
+    def removePlayer(self, player):
+        self.remaining_player_list.remove(player)
 
     def createNewDeck(self):
         self.deck = []
@@ -40,8 +53,12 @@ class Game:
         else:
             return None
 
+    def drawCard(self):
+        card = self.popCard()
+        self.current_player.recieveCard(card)
+
     def assignInitCard(self):
-        for i in range(13):
+        for i in range(9):
             self.player1.hand.append(self.popCard())
             self.player2.hand.append(self.popCard())
             self.player3.hand.append(self.popCard())
@@ -66,8 +83,9 @@ class Card:
 
 
 class Player:
-    def __init__(self, nickname):
+    def __init__(self, nickname, player_id):
         self.nickname = nickname
+        self.player_id = player_id
         self.hand = []
         self.expose_area = []
         self.discard_area = []
@@ -202,7 +220,7 @@ class Player:
         return penable, first_two_same
 
     def Peng(self, discard):
-        penable, first_two_same = self.checkPen(discard)
+        penable, first_two_same = self.checkPeng(discard)
         if penable:
             self.hand.remove(first_two_same[0])
             self.expose_area.append(first_two_same[0])
@@ -227,7 +245,7 @@ class Player:
         return gangable, first_three_same
 
     def Gang(self, discard):
-        gangable, first_three_same = self.checkPen(discard)
+        gangable, first_three_same = self.checkPeng(discard)
         if gangable:
             self.hand.remove(first_three_same[0])
             self.expose_area.append(first_three_same[0])
