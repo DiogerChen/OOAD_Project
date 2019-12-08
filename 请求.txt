@@ -20,10 +20,10 @@
 	hu &			# 胡牌：服务器发送，以询问是否胡
 	zimo			# 自摸：服务器发送，以询问是否自摸
 
-	otherplay _ &		#
-	otherchi _ & & &	#
-	otherpeng _ & & &	#
-	othergang _	& & &	#
+	otherplay _ &		# 他人打牌：服务器发送，_代表该玩家在房间里的ID
+	otherchi _ & & &	# 他人吃牌：服务器发送
+	otherpeng _ & & &	# 他人碰牌：服务器发送
+	othergang _	& & &	# 他人杠牌：服务器发送
 	otherhu _ & & & & & & & & & & & & & &	# 他人胡牌：服务器发送
 
 	wait			# 等待：服务器发送，等待指令，客户端ui可根据该条消息开始显示倒计时
