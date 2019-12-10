@@ -56,13 +56,7 @@ MsgContent_v2.0
     playcard		# 打牌：客户端发送，content为牌的ID。
     例: {"type":"playcard", "socket_id":22, "room":8, "room_id":1, "content":[66]}
 
-	yes				# 同意：客户端发送，以确定碰杠胡(没有吃)
-    例: {"type":"yes", "socket_id":22, "room":8, "room_id":1, "content":[]}
 
-	no				# 拒绝：客户端发送，以拒绝吃碰杠胡
-    例: {"type":"no", "socket_id":22, "room":8, "room_id":1, "content":[]}
-
-    
     card            # 发牌: 服务器发送，content为标有麻将牌ID的数组。
         -当游戏刚刚开始的时候，发送长度为9的数组。
         -当积分选牌完成之后，发送长度为2的数组。
@@ -83,14 +77,13 @@ MsgContent_v2.0
 
         chi         	# 吃牌：服务器发送，以询问是否吃。吃可能存在多种吃法，服务器会发送多次请求。客户端如何实现同时显示多种吃法比较麻烦，这一点暂定为选做吧)
 
-        chiyes          # 确定吃牌：客户端发送，以回复确定吃
-
 	    gang        	# 杠牌：服务器发送，以询问是否杠。
         content中有四张牌，第一张依然是场上的牌
 
 	    hu  			# 胡牌：服务器发送，以询问是否胡
 
 	    zimo			# 自摸：服务器发送，以询问是否自摸
+
         极端例子:
         {
             "type":"specialope",
@@ -98,8 +91,17 @@ MsgContent_v2.0
             "room":8,
             "room_id":1,
             "content":[{"ope":"chi","cards":[[66,69,74], [60,63,66]]},
-                        {"ope":"peng","cards":[12,45,56]}]
+                        {"ope":"peng","cards":[13,14,16]},
+                        {"ope":"gang","cards":[13,14,15,16]}]
         }
+
+    yes          # 确定特殊操作：客户端发送，以回复确定特殊操作。content为选择吃第几组, content为一个长度为5的数组，分别代表 [吃 碰 杠 胡 自摸]
+    吃 的范围为[0,1,2,3]，0代表不做这个操作，别的代表选择吃的选项。
+    碰 杠 胡 自摸 的范围均为[0,1]，0代表不做这个操作，别的代表做这个操作。
+    例: {"type":"yes", "socket_id":22, "room":8, "room_id":1, "content":[2,0,0,0,0]}
+
+    no				# 拒绝：客户端发送，以拒绝吃碰杠胡
+    例: {"type":"no", "socket_id":22, "room":8, "room_id":1, "content":[]}
 
 
 	otherplay		# 他人打牌：服务器发送，content为包含一个字典的数组，分别为玩家在房间里的ID和牌ID

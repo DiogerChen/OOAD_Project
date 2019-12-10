@@ -1,33 +1,11 @@
+import json
+
 class RcvMsg:
     def __init__(self, msg):
-        self.msg = msg.decode('utf-8')
+        self.msg = json.loads(msg.decode('utf-8'))
     
     def Analyse(self):
-        contents = self.msg.spilt()
-        if len(contents) == 2:
-            if contents[1] == 'quitroom':
-                pass
-        elif len(contents) == 3:
-            if contents[1] == 'name':
-                pass
-            elif contents[1] == 'create':
-                pass
-            elif contents[1] == 'joinroom':
-                pass
-            elif contents[1] == 'ready':
-                pass
         
-            elif contents[2] == 'yes':
-                pass
-            elif contents[2] == 'no':
-                pass
-        elif len(contents) == 4:
-            if contents[2] == 'score':
-                pass
-            elif contents[2] == 'choose':
-                pass
-            elif contents[2] == 'playcard':
-                pass
         
 class SendMsg:
     def sendmsg(self, Msg, client_id):
