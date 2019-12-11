@@ -6,6 +6,10 @@ class GameCommand:
         self.game = game
         self.id_to_sock = {}
 
+    def bindAllSock(self, socks):
+        for i in range(4):
+            self.bindSock(i + 1, socks[i])
+
     def bindSock(self, player_id, sock):
         self.id_to_sock[player_id] = sock
 
