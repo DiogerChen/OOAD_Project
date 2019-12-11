@@ -73,10 +73,7 @@ class Card:
         self.card_id = card_id
 
     def __lt__(self, other):
-        if type_hash[self.card_type] != type_hash[other.card_type]:
-            return type_hash[self.card_type] < type_hash[other.card_type]
-        else:
-            return self.card_num < other.card_num
+        return self.card.card_id < other.card.card_id
 
     def __str__(self):
         return self.card_type + ' ' + str(self.card_num)

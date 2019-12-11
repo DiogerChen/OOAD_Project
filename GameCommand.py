@@ -4,6 +4,13 @@ from Logic import *
 class GameCommand:
     def __init__(self, game):
         self.game = game
+        self.id_to_sock = {}
+
+    def bindSock(self, player_id, sock):
+        self.id_to_sock[player_id] = sock
+
+    def getSock(self, player_id):
+        return self.id_to_sock[player_id]
 
     def nextPlayer(self):
         index = self.game.remaining_player_list.index(self.game.current_player)
@@ -109,7 +116,7 @@ class GameCommand:
 
     def checkHu(self, player_id):
         player = self.game.id_to_player[player_id]
-        return player.checkChi()
+        return player.checkHu()
 
     def Hu(self, player_id):
         # calculate score
@@ -118,3 +125,29 @@ class GameCommand:
             index = self.game.remaining_player_list.index(player)
             self.game.current_player = self.game.remaining_player_list[index - 1]
         self.game.remaining_player_list.remove(player)
+
+    def checkAll(self, card_id):
+        # result[0]中依次是player1的：chiable,choices,penable,first_two_same,gangable,first_three_same,huable
+        # 如果该player2已经胡了，则result[1]为None
+        result = [[], [], [], []]
+        card = self.game.id_to_card[card_id]
+        for i in range(1, 5):
+            temp = []
+            player = self.game.id_to_player(i)
+            if player in self.game.remaining_player_list:
+                chiable, choices = self.checkChi(i, card_id)
+                temp.append(chiable)
+                temp.append(choices)
+                penable, first_two_same = self.checkPeng(i, card_id)
+                temp.append(penable)
+                temp.append(first_two_same)
+                gangable, first_three_same = self.checkGang(i, card_id)
+                temp.append(gangable)
+                temp.append(first_three_same)
+                player.recieveCard(card)
+                temp.append(self.checkHu(i))
+                player.hand.remove(card)
+            else:
+                temp = None
+            result[i - 1].append(temp)
+        return result
