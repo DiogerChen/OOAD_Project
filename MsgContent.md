@@ -1,6 +1,6 @@
-MsgContent_v2.0
-#
-客户端JSON格式:
+# MsgContent
+
+客户端服务器通讯的JSON格式:
 
     type: 请求类型，如name, create等
 
@@ -22,7 +22,7 @@ MsgContent_v2.0
     name			# 起名字:客户端发送，content为名字。
     例：{"type":"name", "socket_id":22, "room":-1, "room_id":-1, "content":["Pony"]}
 
-	create		    # 建立房间:客户端发送，content为房间号
+	createroom		# 建立房间:客户端发送，content为空，服务器会返回roominfo(见下)
     例：{"type":"create", "socket_id":22, "room":-1, "room_id":-1, "content":[8]}
 
 	joinroom		# 进入房间: 客户端发送，content为房间号，客户端需要存一下自己的的房间号和房间内的ID(1,2,3,4),这么做是为了方便两边交互
