@@ -1,23 +1,31 @@
 import socket
 import threading
 
-serverName = '10.17.79.87'
-serverPort = 5555
 
-def trans():
-    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    clientSocket.connect((serverName,serverPort))
-    while True:
-        sentence = input('Input lowercase sentence:')
-        clientSocket.send(sentence.encode())
-        modifiedSentence = clientSocket.recv(1024)
-        if sentence == 'quit' :
-            clientSocket.close()
-            print('connection closed')
-            break
-        print ('From Server:', modifiedSentence.decode())
+class client:
+    serverName = '127.0.0.1'
+    serverPort = 5555
+    server = None
+
+    def open(self):
+        clientsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        clientsock.connect((self.serverName, self.serverPort))
+        self.server = clientsock
+        print("connect server successfully")
+        new_thread = threading.Thread(target=self.receive, args=())
+        new_thread.start()  # 开启线程
+
+
+    def receive(self):
+        while True:
+            data = self.server.recv(2048)
+            if data and data != b'quit':
+                print(data.decode())
+            else:
+                self.server.close()
+                print('connection closed')
+
 
 if __name__ == '__main__':
-    trans()
-
-
+    c = client()
+    c.open()
