@@ -50,14 +50,7 @@
     
 #
 游戏界面
-
-    wait            # 等待: 服务器发送，请求客户端等待，客户端UI可根据该条消息显示倒计时(60s)。
-    等待选牌，等待打牌，等待吃碰杠胡同三种情况均使用该请求
-    如果是等待选牌和等待出牌，则content内有当前玩家的房间ID(1~4)
-    如果是吃碰杠胡，则content为空
-    例: {"type":"wait", "room":"8", "room_id":"1", "content":"1"}
-
-    askcard         # 请求打牌: 服务器发送，请求客户端打出一张牌。content为空
+    askcard         # 请求打牌: 服务器发送，请求客户端打出一张牌。content为需要打牌的玩家
     例: {"type":"askcard", "room":"8", "room_id":"1", "content":"1"}
 
     playcard		# 打牌：客户端发送，content为牌的ID。
@@ -72,11 +65,8 @@
 
     pair            # 发送牌组供大家积分选择: 服务器发送，content为5对麻将牌ID组成的数组
     例: {"type":"pair", "room":"8", "room_id":"1", "content":[[23,64],[12,99],[89,105],[14,68],[84,27]]}
-
     score           # 提交积分: 客户端发送，content为数字1~4(共5分)
-
     askchoice       # 请求选择: 服务器发送，content为空
-
     choice          # 提交选择：客户端发送，content为那对牌的index
 
     specialope      # 特殊情况: 指吃碰杠胡，content返回一个含有字典的数组, 字典内含有两个内容:ope和cards。
@@ -105,24 +95,24 @@
             "hu":"0"
         }
 
-    yes          # 确定特殊操作：客户端发送，以回复确定特殊操作。content为选择吃第几组, content为一个长度为5的数组，分别代表 [吃 碰 杠 胡 自摸]
-    吃 的范围为[0,1,2,3]，0代表不做这个操作，别的代表选择吃的选项。
-    碰 杠 胡 自摸 的范围均为[0,1]，0代表不做这个操作，别的代表做这个操作。
-    例: {"type":"yes", "socket_id":22, "room":8, "room_id":1, "content":[2,0,0,0,0]}
+    opereply          # 确定特殊操作：客户端发送，以回复确定特殊操作。content为0~6的数字。
+    0：不做任何操作
+    1；吃的第一种情况
+    2：吃的第二种情况
+    3：吃的第三种情况
+    4：碰
+    5：杠
+    6：胡
+    例: {"type":"opereply", "socket_id":22, "room":8, "room_id":1, "content":"0"}
 
-    no				# 拒绝：客户端发送，以拒绝吃碰杠胡
-    例: {"type":"no", "socket_id":22, "room":8, "room_id":1, "content":[]}
+	play		# 他人打牌：服务器发送，content为玩家在房间里的ID和牌ID
+    例: {"type":"play", "room":8, "room_id":1, "player":"2", "card":"66"}
+
+	cpg    	# 他人吃碰杠牌：服务器发送，content为玩家在房间里的ID，和他吃的三张牌的ID(就是chi里面传递的三张牌)
+    例: {"type":"cpg", "room":"8", "room_id":"2", "player":"1", "card":"66 69 73"}
+
+	hu     	# 他人胡牌：服务器发送
+    例: {"type":"hu", "room":"8", "room_id":"2", "player":"1", "card":"1"}
 
 
-	otherplay		# 他人打牌：服务器发送，content为包含一个字典的数组，分别为玩家在房间里的ID和牌ID
-    例: {"type":"otherplay","room":8, "room_id":1, "player":"2", "card":"66"]}
 
-	otherchi    	# 他人吃牌：服务器发送，content为包含一个字典的数组，分别为玩家在房间里的ID，和他吃的三张牌的ID(就是chi里面传递的三张牌)
-    例: {"type":"otherchi", "room":"8", "room_id":"2", "player":"1", "card":"66 69 73"}
-
-	otherpeng   	# 他人碰牌：服务器发送
-
-	othergang       # 他人杠牌：服务器发送
-
-	otherhu     	# 他人胡牌：服务器发送
-    例: {"type":"otherhu", "room":"8", "room_id":"2", "player":"1", "card":"66 69 73 14 24 53 34 35 67 41 32 15 67 35"}
