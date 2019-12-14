@@ -64,7 +64,7 @@
     例: {"type":"card", "room":"8", "room_id":"1", "content":"66"}
 
     pair            # 发送牌组供大家积分选择: 服务器发送，content为5对麻将牌ID组成的数组
-    例: {"type":"pair", "room":"8", "room_id":"1", "content":[[23,64],[12,99],[89,105],[14,68],[84,27]]}
+    例: {"type":"pair", "room":"8", "room_id":"1", "content":"23 64 12 99 89 105 14 68 84 27"}
     score           # 提交积分: 客户端发送，content为数字1~4(共5分)
     askchoice       # 请求选择: 服务器发送，content为空
     choice          # 提交选择：客户端发送，content为那对牌的index
