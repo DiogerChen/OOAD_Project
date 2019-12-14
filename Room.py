@@ -71,7 +71,7 @@ class Room:
         player.recieveCard(card2)
 
     def getHand(self, player_id):
-        player = self.game.id_to_player[player_id]
+        player = self.game.id_to_player[player_id-1]
         result = []
         for card in player.hand:
             result.append(card.card_id)

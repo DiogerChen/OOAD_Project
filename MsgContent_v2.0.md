@@ -63,12 +63,12 @@
     playcard		# 打牌：客户端发送，content为牌的ID。
     例: {"type":"playcard", "socket_id":"22", "room":"8", "room_id":"1", "content":"66"}
 
+    initcard            # 发初始牌: 服务器发送，当游戏刚刚开始的时候，发送含有4*9个数字的字符串。前9个默认为1的，接着9个为2的，再9个为3的，最后9个为4的
+    例: {"type":"initcard", "room":"8", "room_id":"1", "content":"66 21..."}
 
-    card            # 发牌: 服务器发送，content为标有麻将牌ID的数组。
-        -当游戏刚刚开始的时候，发送长度为9的数组。
-        -当积分选牌完成之后，发送长度为2的数组。
-        -当每回合发牌的时候，发送长度为1的数组。
-    例: {"type":"card", "room":"8", "room_id":"1", "content":"66"}
+    card                # 发牌：服务器向四个客户端发送，"player"为客户端ID，"card"为牌ID，如果是积分选课的牌，会传两张牌：
+    我对前端想法：积分选课的话，有人选走了牌之后，收到这个消息，客户端直接移牌到那个玩家的牌堆里，这样就相当于更新了一下剩下的卡组。
+    例: {"type":"card", "room":"8", "room_id":"1", "player":"3", "content":"66 21"}
 
     pair            # 发送牌组供大家积分选择: 服务器发送，content为5对麻将牌ID组成的数组
     例: {"type":"pair", "room":"8", "room_id":"1", "content":"23 64 12 99 89 105 14 68 84 27"}
@@ -78,8 +78,6 @@
     askchoice       # 请求选择: 服务器发送，content为空
 
     choice          # 提交选择：客户端发送，content为那对牌的index
-
-    pairsupdate     # 
 
     specialope      # 特殊情况: 指吃碰杠胡，content返回一个含有字典的数组, 字典内含有两个内容:ope和cards。
         peng    		# 碰牌：服务器发送，以询问是否碰，cards为三张牌的ID组成的数组，其中第一张为打出来的牌，另外两张为手牌
@@ -120,11 +118,8 @@
 	play		# 他人打牌：服务器发送，content为玩家在房间里的ID和牌ID
     例: {"type":"play", "room":8, "room_id":1, "player":"2", "card":"66"}
 
-	cpg    	# 他人吃碰杠牌：服务器发送，content为玩家在房间里的ID，和他吃的三张牌的ID(就是chi里面传递的三张牌)
+	cpg    	# 他人吃碰杠牌：服务器发送，content为玩家在房间里的ID，和他吃碰杠的三/四张牌的ID(因为是直接显示，所以先不管怎么出)
     例: {"type":"cpg", "room":"8", "room_id":"2", "player":"1", "card":"66 69 73"}
 
-	hu     	# 他人胡牌：服务器发送，
-    例: {"type":"hu", "room":"8", "room_id":"2", "player":"1", "content":"1"}
-
-
-
+	hu     	# 他人胡牌：服务器发送
+    例: {"type":"hu", "room":"8", "room_id":"2", "player":"1"}
