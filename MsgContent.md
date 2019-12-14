@@ -1,10 +1,10 @@
 # MsgContent
 
-客户端服务器通讯的JSON格式:
+客户端通讯的JSON格式:
 
-    type: 请求类型，如name, create等
+    "type": 请求类型，如name, create等
 
-    socket_id: 客户端连接服务器后，服务器会将会话存入数组中，返回该会话的index + 1(可以理解为account)。如果是服务器发送的请求，socket_id设为0。
+    "socket_id": 客户端连接服务器后，服务器会将会话存入数组中，返回该会话的index + 1(可以理解为account)。如果是服务器发送的请求，socket_id设为0。
 
     "room": 所在的房间号。如果没有加入房间，默认值为-1
 
@@ -12,34 +12,41 @@
 
     "content": 请求内容。考虑到某些请求会携带多个内容，所以设为一个数组
 
-    {"type":"STRING", "socket_id":INT, "room":INT, "room_id":INT, "content":[ARRAY]}
+    {"type":"STRING", "socket_id":"STRING", "room":"STRING", "room_id":"STRING", "content":"STRING"}
+
+服务器通讯的JSON格式:
+    没有"socket_id"这一项。
+
 
 #
 具体请求类型列举：
 
 大厅界面
+    id              # 初次连接回复: 服务器发送，content为socket_id。
+    例：{"type":"id", "room":-1, "room_id":-1, "content":"2"}
+
 
     name			# 起名字:客户端发送，content为名字。
-    例：{"type":"name", "socket_id":22, "room":-1, "room_id":-1, "content":["Pony"]}
+    例：{"type":"name", "socket_id":"22", "room":"-1", "room_id":"-1", "content":"Pony"}
 
 	createroom		# 建立房间:客户端发送，content为空，服务器会返回roominfo(见下)
-    例：{"type":"create", "socket_id":22, "room":-1, "room_id":-1, "content":[8]}
+    例：{"type":"create", "socket_id":"22", "room":"-1", "room_id":"-1", "content":"8"}
 
 	joinroom		# 进入房间: 客户端发送，content为房间号，客户端需要存一下自己的的房间号和房间内的ID(1,2,3,4),这么做是为了方便两边交互
-    例: {"type":"joinroom", "socket_id":23, "room":-1, "room_id":-1, "content":[8]}
+    例: {"type":"joinroom", "socket_id":"23", "room":"-1", "room_id":"-1", "content":"8"}
 
 	ready   		# 游戏准备: 客户端发送，content为空。当同一房间四个同样的ready消息发出，服务器才会开始这个房间的游戏(ready++, startgame if ready==4)
-    例: {"type":"ready", "socket_id":23, "room":8, "room_id":2, "content":[]}
+    例: {"type":"ready", "socket_id":"23", "room":"8", "room_id":"2", "content":null}
 
     cancelready     # 取消准备: 客户端发送，content为空(ready--)
-    例: {"type":"cancelready", "socket_id":23, "room":8, "room_id":2, "content":[]}
+    例: {"type":"cancelready", "socket_id":"23", "room":"8", "room_id":"2", "content":null}
 
 	quitroom		# 退出房间：客户端发送，content为空。
-    例: {"type":"quitroom", "socket_id":23, "room":8, "room_id":2, "content":""}
+    例: {"type":"quitroom", "socket_id":"23", "room":"8", "room_id":"2", "content":null}
     
     roominfo        # 房间信息: 服务器发送，room_id为该客户端房间内ID，content为房间内玩家的信息。由两个字典构成，第一个字典是玩家名称，如果没有人就是空string，第二个字典是准备情况，没准备好就是空string。
     这条消息是房间内所有人都会收到的，只要有人加入或者退出房间，准备或者取消准备，服务器就会发送一遍
-    例: {"type":"roominfo", "socket_id":0, "room":8, "room_id":2, "name":"Pony Sam no no","ready":"1 0 0 0"}
+    例: {"type":"roominfo", "socket_id":"0", "room":"8", "room_id":"2", "name":"Pony Sam no no","ready":"1 0 0 0"}
     
 #
 游戏界面
@@ -48,23 +55,23 @@
     等待选牌，等待打牌，等待吃碰杠胡同三种情况均使用该请求
     如果是等待选牌和等待出牌，则content内有当前玩家的房间ID(1~4)
     如果是吃碰杠胡，则content为空
-    例: {"type":"wait", "socket_id":0, "room":8, "room_id":"1", "content":""}
+    例: {"type":"wait", "room":"8", "room_id":"1", "content":""}
 
     askcard         # 请求打牌: 服务器发送，请求客户端打出一张牌。content为空
-    例: {"type":"askcard", "socket_id":0, "room":8, "room_id":"1", "content":""}
+    例: {"type":"askcard", "room":"8", "room_id":"1", "content":null}
 
     playcard		# 打牌：客户端发送，content为牌的ID。
-    例: {"type":"playcard", "socket_id":22, "room":8, "room_id":"1", "content":"66"}
+    例: {"type":"playcard", "socket_id":"22", "room":"8", "room_id":"1", "content":"66"}
 
 
     card            # 发牌: 服务器发送，content为标有麻将牌ID的数组。
         -当游戏刚刚开始的时候，发送长度为9的数组。
         -当积分选牌完成之后，发送长度为2的数组。
         -当每回合发牌的时候，发送长度为1的数组。
-    例: {"type":"card", "socket_id":0, "room":8, "room_id":1, "content":"66"}
+    例: {"type":"card", "room":"8", "room_id":"1", "content":"66"}
 
     pair            # 发送牌组供大家积分选择: 服务器发送，content为5对麻将牌ID组成的数组
-    例: {"type":"pair", "socket_id":0, "room":8, "room_id":1, "content":[[23,64],[12,99],[89,105],[14,68],[84,27]]}
+    例: {"type":"pair", "room":"8", "room_id":"1", "content":[[23,64],[12,99],[89,105],[14,68],[84,27]]}
 
     score           # 提交积分: 客户端发送，content为数字1~4(共5分)
 
@@ -91,11 +98,11 @@
             "room":8,
             "room_id":1,
             "chi1":"32 36 40"
-	    "chi2":"28 32 36"
-	    "chi3": null
-	    "peng": null
-	    "gang": null
-	    "hu":"0"
+            "chi2":"28 32 36"
+            "chi3": null
+            "peng": null
+            "gang": null
+            "hu":"0"
         }
 
     yes          # 确定特殊操作：客户端发送，以回复确定特殊操作。content为选择吃第几组, content为一个长度为5的数组，分别代表 [吃 碰 杠 胡 自摸]
@@ -108,10 +115,10 @@
 
 
 	otherplay		# 他人打牌：服务器发送，content为包含一个字典的数组，分别为玩家在房间里的ID和牌ID
-    例: {"type":"otherplay", "socket_id":0, "room":8, "room_id":1, "content":[{player:2, card:66}]}
+    例: {"type":"otherplay","room":8, "room_id":1, "content":[{player:2, card:66}]}
 
 	otherchi    	# 他人吃牌：服务器发送，content为包含一个字典的数组，分别为玩家在房间里的ID，和他吃的三张牌的ID(就是chi里面传递的三张牌)
-    例: {"type":"otherchi", "socket_id":"0", "room":"8", "room_id":"2", "player":"1","card":"66 69 73"}
+    例: {"type":"otherchi", "room":"8", "room_id":"2", "player":"1", "card":"66 69 73"}
 
 	otherpeng   	# 他人碰牌：服务器发送
 
