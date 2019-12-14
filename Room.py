@@ -1,5 +1,5 @@
 from Logic import *
-from State import *
+from GameStates import *
 import numpy as np
 
 
@@ -19,6 +19,7 @@ class Room:
             if u is None:
                 u = user
                 user.room_id = self.user_list.index(u) + 1
+                break
 
     def removeUser(self, user_room_id):
         self.user_list[user_room_id - 1] = None
