@@ -46,6 +46,13 @@ class Room:
             r.append(self.game.popCard().card_id)
         return result
 
+    def assignPair(self, player_id, pair):
+        player = self.game.id_to_player[player_id]
+        card1 = self.game.id_to_card[pair[0]]
+        card2 = self.game.id_to_card[pair[1]]
+        player.recieveCard(card1)
+        player.recieveCard(card2)
+
     def getHand(self, player_id):
         player = self.game.id_to_player[player_id]
         result = []
