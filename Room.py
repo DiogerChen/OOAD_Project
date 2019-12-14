@@ -23,6 +23,14 @@ class Room:
     def removeUser(self, user_room_id):
         self.user_list[user_room_id - 1] = None
 
+    def checkReady(self):
+        for u in self.user_list:
+            if u is not None and u.isReady:
+                pass
+            else:
+                return False
+        return True
+
     def getSock(self, player_id):
         return self.user_list[player_id - 1].socket_id
 
