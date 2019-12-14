@@ -4,11 +4,11 @@ type_hash = {'wan': 0, 'tiao': 1, 'bin': 2, 'dong': 3, 'xi': 4, 'nan': 5, 'bei':
 
 
 class Game:
-    def __init__(self, player1_nickname, player2_nickname, player3_nickname, player4_nickname):
-        self.player1 = Player(player1_nickname, 1)
-        self.player2 = Player(player2_nickname, 2)
-        self.player3 = Player(player3_nickname, 3)
-        self.player4 = Player(player4_nickname, 4)
+    def __init__(self):
+        self.player1 = Player(1)
+        self.player2 = Player(2)
+        self.player3 = Player(3)
+        self.player4 = Player(4)
         self.original_player_list = [self.player1, self.player2, self.player3, self.player4]
         self.remaining_player_list = [self.player1, self.player2, self.player3, self.player4]
         self.deck = None
@@ -79,8 +79,7 @@ class Card:
 
 
 class Player:
-    def __init__(self, nickname, player_id):
-        self.nickname = nickname
+    def __init__(self, player_id):
         self.player_id = player_id
         self.hand = []
         self.expose_area = []

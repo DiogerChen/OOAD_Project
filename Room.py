@@ -5,7 +5,7 @@ from State import *
 class Room:
     def __init__(self, room_id):
         self.room_id = room_id
-        self.id_to_sock = {}
+        self.user_list = []
         self.game = None
         self.state = WaitReadyState(self)
         self.replies = []
@@ -13,15 +13,11 @@ class Room:
     def ChangeToNextState(self, reply):
         self.state.ChangeToNextState(reply)
 
-    def bindAllSock(self, socks):
-        for i in range(4):
-            self.bindSock(i + 1, socks[i])
-
-    def bindSock(self, player_id, sock):
-        self.id_to_sock[player_id] = sock
+    def addUser(self, user):
+        self.user_list.append(user)
 
     def getSock(self, player_id):
-        return self.id_to_sock[player_id]
+        return self.user_list[player_id - 1].socket_id
 
     def nextPlayer(self):
         index = self.game.remaining_player_list.index(self.game.current_player)
