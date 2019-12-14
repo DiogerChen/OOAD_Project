@@ -1,6 +1,9 @@
 from Logic import *
-from GameCommand import *
+from Room import *
+from User import *
+import json
 import time
+import random
 
 # 状态模式
 class State:
@@ -24,43 +27,74 @@ class WaitReadyState(State):
         self.server = server
 
     def ChangeToNextState(self, reply):
+        reply = json.loads(reply.decode('utf-8'))
+        # update according to the reply
         if reply["type"] == "joinroom":
-            self.game.ready += 1
-            self.room.players.append(Player())
-            for i in self.room.players:
+            self.room.addUser(User(reply["socket_id"]))
+        elif reply["type"] == "ready":
+            self.game.user_list[reply["room_id"]].setReady()
+        elif reply["type"] == "cancelready":
+            self.game.user_list[reply["room_id"]].setUnready()
+        elif reply["type"] == "quitroom":
+            self.game.removeUser(reply["room_id"])
+        # edit the json
+        roominfoupdate = {"type":"roominfo", "room":room.room_id,"room_id":None, "name":"", "ready":None}
+        for i in self.room.user_list:
+            if i is None:
+                roominfoupdate["name"] += '_ '
+                roominfoupdate["ready"] += '0 '                
+                continue
+            else:
+                roominfoupdate["name"] += i.name + ' '
+                if i.isready == True:
+                    roominfoupdate["ready"] += '1 '
+                else:
+                    roominfoupdate["ready"] += '0 '
+        # send the roominfo Msg to every room players        
+        for i in self.room.user_list:
+            roominfoupdate["room_id"] = str(i.room_id)
+            self.room.server.send(i.socket_id,json.dumps(roominfoupdate).encode('utf-8'))
+        # go to the next state
+        if self.room.checkready == True:
+            self.college = self.room.createGame()
+            self.room.assignInitCard()
+            self.room.state = WaitSupervisorState(self.room, self.server)
+        
 
-                self.room.server.send()
-            # send the roominfo Msg to every room players
-        if self.room.ready == 4:
-            self.room.gamecommand.assignInitCard()
-            self.room.state = WaitChoiceState(self.room, self.server)
-
-
-class WaitChoiceState(State):
+class WaitSupervisorState(State):
     def __str__(self):
-        return "Waiting for the choice of the players"
+        return "Waiting for the choice of the supervisor"
+
+    def __init__(self, room, server):
+        self.room = room
+        self.server = server
+
+
+class WaitPairChoiceState(State):
+    def __str__(self):
+        return "Waiting for the choice of the card pairs"
 
     def __init__(self, room, server):
         self.room = room
         self.server = server
     
     def ChangeToNextState(self, reply):
-        
+        reply = json.loads(reply.decode('utf-8'))
         self.room
         self.room.state = WaitCardState()
 
 
 class WaitCardState(State):
     def __str__(self):
-        return "Waiting for a card from player" + str(self.game.currentplayer) # ??
+        return "Waiting for a card from player"
 
     def __init__(self, room, server):
         self.room = room
         self.server = server
 
     def ChangeToNextState(self, reply):
-        # reply = {"type":"playcard", "socket_id":22, "room":8, "room_id":1, "content":[66]}
-        result = self.room.gamecommand.checkAll(reply["content"][0])
+        reply = json.loads(reply.decode('utf-8'))
+        result = self.room.checkAll(reply["content"][0])
         specialoperationflag = False
         self.room.requestsend = 0     # 发送的请求数，对应的需要收到相应数目的回复
         for r in result:
@@ -73,8 +107,8 @@ class WaitCardState(State):
             self.room.replies = []
             self.room.state = WaitSpecailReplyState(self.room.requestsend)
         else:
-            self.room.gamecommand.drawCard()
-            if self.room.checkZimo() == True:    #
+            self.room.drawCard()
+            if self.room.checkHu() == True:    #
                 self.room.state = WaitZimoState()
                 self.server.send(self.game.currentplayer, "")   #
             else:
@@ -84,8 +118,6 @@ class WaitCardState(State):
                 #self.room.WaitSpecailReplyState = WaitSpecailReplyState()
 
      
-
-
 class WaitSpecailReplyState(State):
     def __str__(self):
         return "Waiting for the reply/replies of specail operation"
@@ -95,6 +127,7 @@ class WaitSpecailReplyState(State):
         self.server = server
 
     def ChangeToNextState(self, reply):
+        reply = json.loads(reply.decode('utf-8'))
         self.replies.append(reply)
         self.needtorecieve -= 1
         if self.needtorecieve == 0:
@@ -111,7 +144,4 @@ class WaitZimoState(State):
         self.server = server
 
     def ChangeToNextState(self, reply):
-        pass
-
-
-# self.room.state.ChangeToNextState(__self__,reply)
+        reply = json.loads(reply.decode('utf-8'))
