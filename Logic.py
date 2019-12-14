@@ -4,8 +4,7 @@ type_hash = {'wan': 0, 'tiao': 1, 'bin': 2, 'dong': 3, 'xi': 4, 'nan': 5, 'bei':
 
 
 class Game:
-    def __init__(self, room_id, player1_nickname, player2_nickname, player3_nickname, player4_nickname):
-        self.room_id = room_id
+    def __init__(self, player1_nickname, player2_nickname, player3_nickname, player4_nickname):
         self.player1 = Player(player1_nickname, 1)
         self.player2 = Player(player2_nickname, 2)
         self.player3 = Player(player3_nickname, 3)
