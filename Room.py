@@ -1,11 +1,12 @@
 from Logic import *
 from State import *
+import numpy as np
 
 
 class Room:
     def __init__(self, room_id):
         self.room_id = room_id
-        self.user_list = []
+        self.user_list = [None, None, None, None]
         self.game = None
         self.state = WaitReadyState(self)
         self.replies = []
@@ -14,10 +15,21 @@ class Room:
         self.state.ChangeToNextState(reply)
 
     def addUser(self, user):
-        self.user_list.append(user)
+        for u in self.user_list:
+            if u is None:
+                u = user
+                user.room_id = self.user_list.index(u) + 1
+
+    def removeUser(self, user_room_id):
+        self.user_list[user_room_id - 1] = None
 
     def getSock(self, player_id):
         return self.user_list[player_id - 1].socket_id
+
+    def createGame(self):
+        colleges = np.random.choice([1, 2, 3, 4, 5, 6], 2, True)
+        self.game = Game(colleges[0], colleges[1])
+        return colleges
 
     def nextPlayer(self):
         index = self.game.remaining_player_list.index(self.game.current_player)
@@ -64,6 +76,7 @@ class Room:
     def playCard(self, card_id):
         card = self.game.id_to_card[card_id]
         self.game.current_player.playCard(card)
+        self.nextPlayer()
 
     def playRandomCard(self):
         return self.game.current_player.discardRandomCard().card_id
@@ -132,8 +145,7 @@ class Room:
         discard = self.game.id_to_card[discard_id]
         player.Gang(discard)
         # 杠与胡都需要暂时把current_player设成上家，以便nextPlayer()可以返还正确的next player
-        index = self.game.remaining_player_list.index(player)
-        self.game.current_player = self.game.remaining_player_list[index - 1]
+        self.game.current_player = player
 
     def checkHu(self, player_id):
         player = self.game.id_to_player[player_id]
@@ -143,9 +155,10 @@ class Room:
         # calculate score
         player = self.game.id_to_player[player_id]
         if len(self.game.remaining_player_list) > 1:
-            index = self.game.remaining_player_list.index(player)
-            self.game.current_player = self.game.remaining_player_list[index - 1]
-        self.game.remaining_player_list.remove(player)
+            self.game.remaining_player_list.remove(player)
+            self.nextPlayer()
+        else:
+            self.nextPlayer()
 
     def checkAll(self, card_id):
         # result[0]中依次是player1的：chiable,choices,penable,first_two_same,gangable,first_three_same,huable

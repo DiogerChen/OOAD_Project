@@ -1,10 +1,11 @@
 import random
+import numpy as np
 
 type_hash = {'wan': 0, 'tiao': 1, 'bin': 2, 'dong': 3, 'xi': 4, 'nan': 5, 'bei': 6, 'bai': 7, 'fa': 8, 'zhong': 9}
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, no_college1, no_college2):
         self.player1 = Player(1)
         self.player2 = Player(2)
         self.player3 = Player(3)
@@ -14,7 +15,7 @@ class Game:
         self.deck = None
         self.id_to_card = {}
         self.id_to_player = {1: self.player1, 2: self.player2, 3: self.player3, 4: self.player4}
-        self.createNewDeck()
+        self.createNewDeck(no_college1, no_college2)
         self.current_player = self.player1
 
     def nextPlayer(self):
@@ -27,10 +28,10 @@ class Game:
     def removePlayer(self, player):
         self.remaining_player_list.remove(player)
 
-    def createNewDeck(self):
+    def createNewDeck(self, no_college1, no_college2):
         self.deck = []
         shu_pai = ['wan', 'tiao', 'bin']
-        zi_pai = ['dong', 'xi', 'nan', 'bei', 'bai', 'fa', 'zhong']
+        zi_pai = ['zhiren', 'shuren', 'zhicheng', 'shude', 'zhixin', 'shuli', 'bai', 'fa', 'zhong']
         id_counter = 0
         for t in shu_pai:
             for i in range(1, 10):
@@ -45,6 +46,9 @@ class Game:
                 self.deck.append(card)
                 self.id_to_card[id_counter] = card
                 id_counter += 1
+        for c in self.deck:
+            if c.card_type == zi_pai[no_college1 - 1] or c.card_type == zi_pai[no_college2 - 1]:
+                self.deck.remove(c)
 
     def popCard(self):
         if len(self.deck) > 0:
