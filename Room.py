@@ -12,7 +12,7 @@ class Room:
         self.replies = []
 
     def ChangeToNextState(self, reply):
-        self.state.ChangeToNextState(reply)
+        self.state.changeToNextState(reply)
 
     def addUser(self, user):
         for u in self.user_list:

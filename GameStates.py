@@ -21,7 +21,7 @@ class State:
         self.room = room
         self.server = server
     
-    def ChangeToNextState(self, reply):
+    def changeToNextState(self, reply):
         # 需要一个服务器每次收到消息都执行ChangeToNextState()的方法
         pass
 
@@ -34,8 +34,7 @@ class WaitReadyState(State):
         self.room = room
         self.server = server
 
-    def ChangeToNextState(self, reply):
-        reply = json.loads(reply.decode('utf-8'))
+    def changeToNextState(self, reply):
         # update according to the reply
         if reply["type"] == "joinroom":
             self.room.addUser(User(reply["socket_id"]))
@@ -63,11 +62,14 @@ class WaitReadyState(State):
 
         # go to create a game
         if self.room.checkready == True:
-            college = self.room.createGame()
-            collegelostmsg = {"type":"college", "room":self.room.room_id, "room_id":None, "content":"{} {}".format(college[0], college[1])}
-            sendmsgtogether(self.room.user_list, self.server, collegelostmsg)   # send college ID that will not appear in this game
-
-            self.room.state = WaitSupervisorState(self.room, self.server)
+            self.room.assignInitCard()
+            carddata = {"type":"initcard", "room":room.room_id, "room_id":None, "content":""}
+            for i in range(1, 5):
+                for c in self.room.getHand(i):
+                    carddata["content"] += str(c) + ' '
+            sendmsgtogether(self.room.user_list, self.server, carddata)
+            self.room.drawCard()
+            self.room.state = WaitCardState(self.room, self.server)
         
 
 class WaitSupervisorState(State):
@@ -79,8 +81,7 @@ class WaitSupervisorState(State):
         self.server = server
         self.room.replies = []  # need to use it store 4 replies
 
-    def ChangeToNextState(self, reply):
-        reply = json.loads(reply.decode('utf-8'))
+    def changeToNextState(self, reply):
         if reply["type"] == "supervisor":
             # 需要player对象里有存supervisor的变量
             pass
@@ -112,8 +113,7 @@ class WaitScoreState(State):
         self.server = server
         self.room.replies = []  # need to use it store 4 replies
 
-    def ChangeToNextState(self, reply):
-        reply = json.loads(reply.decode('utf-8'))
+    def changeToNextState(self, reply):
         if reply["type"] == "supervisor":
             self.room.replies.append(reply)
             # 这里我还需要根据下面需要的的内容再改
@@ -133,14 +133,13 @@ class WaitPairChoiceState(State):
         self.server = server
         self.selectround = 0    # there are 8 rounds in choose pairs, this is a counter to record the round
 
-    def ChangeToNextState(self, reply):
-        reply = json.loads(reply.decode('utf-8'))
+    def changeToNextState(self, reply):
         if reply["type"] == "choice":
             # 仍需敲定细节
             self.selectround += 1
             # sendmsgtogether
         if self.selectround == 8:
-            self.room.state = WaitCardState()
+            self.room.state = WaitCardState()   ###
 
 
 class WaitCardState(State):
@@ -151,8 +150,7 @@ class WaitCardState(State):
         self.room = room
         self.server = server
 
-    def ChangeToNextState(self, reply):
-        reply = json.loads(reply.decode('utf-8'))
+    def changeToNextState(self, reply):
         self.room.playCard(reply["content"][0])
         result = self.room.checkAll(reply["content"][0])
         specialoperationflag = False
@@ -209,8 +207,7 @@ class WaitSpecailReplyState(State):
         self.room = room
         self.server = server
 
-    def ChangeToNextState(self, reply):
-        reply = json.loads(reply.decode('utf-8'))
+    def changeToNextState(self, reply):
         self.room.replies.append(reply)
         if len(self.room.replies) == 4:
             highestchoice = 0   # 需要一个方法根据操作的优先级和编号来决定操作由谁做
@@ -226,9 +223,7 @@ class WaitZimoState(State):
         self.room = room
         self.server = server
 
-    def ChangeToNextState(self, reply):
-        reply = json.loads(reply.decode('utf-8'))
-
+    def changeToNextState(self, reply):
         if reply["hu"] is None:
             self.room.nextPlayer()
             self.room.drawCard()
@@ -237,4 +232,3 @@ class WaitZimoState(State):
             self.room.Hu(reply["room_id"])
             self.room.drawCard()
             self.room.state = WaitCardState(self.room, self.server)
-

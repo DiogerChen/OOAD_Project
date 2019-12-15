@@ -1,17 +1,27 @@
 import socket
 import threading
-
+import json
+import random
+import Room
 
 class server:
     serverName = '127.0.0.1'
     serverPort = 5555
     client = []
+    self.rooms = {}
 
     def receive(self, clientsock):
         while True:
             data = clientsock.recv(2048)
             if data and data != b'quit':
+                data = json.loads(data.decode('utf-8'))
                 print(data.decode())
+                if data["type"] == "createroom":
+                    roomid = random.randint(1000,9999)
+                    self.rooms[roomid] = Room(roomid)
+                    # send roominfo
+                else:
+                    self.rooms[data["room"]].state.changeToNextState(data)
             else:
                 clientsock.close()
                 print('connection closed')

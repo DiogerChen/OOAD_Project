@@ -26,7 +26,7 @@
     id              # 初次连接回复: 服务器发送，content为socket_id。
     例：{"type":"id", "room":-1, "room_id":-1, "content":"2"}
 
-    name			# 起名字:客户端发送，content为名字。
+    // name			# 起名字:客户端发送，content为名字。
     例：{"type":"name", "socket_id":"22", "room":"-1", "room_id":"-1", "content":"Pony"}
 
 	createroom		# 建立房间:客户端发送，content为空，服务器会返回roominfo(见下)
@@ -66,7 +66,7 @@
     initcard            # 发初始牌: 服务器发送，当游戏刚刚开始的时候，发送含有4*9个数字的字符串。前9个默认为1的，接着9个为2的，再9个为3的，最后9个为4的
     例: {"type":"initcard", "room":"8", "room_id":"1", "content":"66 21..."}
 
-    card                # 发牌：服务器向四个客户端发送，"player"为客户端ID，"card"为牌ID，如果是积分选课的牌，会传两张牌：
+    card            # 发牌：服务器向四个客户端发送，"player"为客户端ID，"card"为一/两张牌的ID。
     我对前端想法：积分选课的话，有人选走了牌之后，收到这个消息，客户端直接移牌到那个玩家的牌堆里，这样就相当于更新了一下剩下的卡组。
     例: {"type":"card", "room":"8", "room_id":"1", "player":"3", "content":"66 21"}
 
