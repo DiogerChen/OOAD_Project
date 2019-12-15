@@ -159,17 +159,28 @@ class WaitCardState(State):
         specialopedata = {"type":"specialope", "room":str(self.room.room_id), "room_id":None, "chi1":None, "chi2":None, "chi3":None, "peng":None,"gang":None, "hu":"0"}
         
         for i in range(0,4):
-            if result[i][0] == 1:
-                specialopedata["chi1"] = '{} {} {}'.format(result[i][1][0], result[i][1][1], result[i][1][2])
-            elif result[i][0] == 2:
-                specialopedata["chi1"] = '{} {} {}'.format(result[i][1][0], result[i][1][1], result[i][1][2])
-                specialopedata["chi2"] = '{} {} {}'.format(result[i][1][3], result[i][1][4], result[i][1][5])
-            elif result[i][0] == 3:
-                specialopedata["chi1"] = '{} {} {}'.format(result[i][1][0], result[i][1][1], result[i][1][2])
-                specialopedata["chi2"] = '{} {} {}'.format(result[i][1][3], result[i][1][4], result[i][1][5])
-                specialopedata["chi3"] = '{} {} {}'.format(result[i][1][6], result[i][1][7], result[i][1][8])
+            if result[i][0] == 0:
+                specialopedata["chi1"] = None
+                specialopedata["chi2"] = None
+                specialopedata["chi3"] = None
+            else:
+                if result[i][1][0] is None:
+                    specialopedata["chi1"] = None
+                else:
+                    specialopedata["chi1"] = '{} {} {}'.format(result[i][1][0][0], result[i][1][0][1],
+                                                               result[i][1][0][2])
+                if result[i][1][1] is None:
+                    specialopedata["chi2"] = None
+                else:
+                    specialopedata["chi2"] = '{} {} {}'.format(result[i][1][1][0], result[i][1][1][1],
+                                                               result[i][1][1][2])
+                if result[i][1][2] is None:
+                    specialopedata["chi3"] = None
+                else:
+                    specialopedata["chi3"] = '{} {} {}'.format(result[i][1][2][0], result[i][1][2][1],
+                                                               result[i][1][2][2])
             if result[i][2] == 1:
-                specialopedata["peng"] = '{} {} {}'.format(result[i][3][0], result[i][1][1], result[i][1][2])
+                specialopedata["peng"] = '{} {} {}'.format(result[i][3][0], result[i][3][1], result[i][3][2])
             if result[i][4] == 1:
                 specialopedata["gang"] = '{} {} {} {}'.format(result[i][5][0], result[i][5][1], result[i][5][2], result[i][5][3])
             if result[i][6] == 1:
