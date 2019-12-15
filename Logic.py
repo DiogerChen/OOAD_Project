@@ -76,7 +76,7 @@ class Card:
         self.card_id = card_id
 
     def __lt__(self, other):
-        return self.card.card_id < other.card.card_id
+        return self.card_id < other.card_id
 
     def __str__(self):
         return self.card_type + ' ' + str(self.card_num)
