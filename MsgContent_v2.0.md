@@ -82,7 +82,7 @@
     specialope      # 特殊情况: 指吃碰杠胡，content返回一个含有字典的数组, 字典内含有两个内容:ope和cards。
         peng    		# 碰牌：服务器发送，以询问是否碰，cards为三张牌的ID组成的数组，其中第一张为打出来的牌，另外两张为手牌
 
-        chi         	# 吃牌：服务器发送，以询问是否吃。吃可能存在多种吃法，服务器会发送多次请求。客户端如何实现同时显示多种吃法比较麻烦，这一点暂定为选做吧)
+        chi         	# 吃牌：服务器发送，以询问是否吃。吃可能存在多种吃法
 
 	    gang        	# 杠牌：服务器发送，以询问是否杠。
         content中有四张牌，第一张依然是场上的牌
@@ -94,14 +94,13 @@
         极端例子:
         {
             "type":"specialope",
-            "socket_id":0,
             "room":8,
             "room_id":1,
-            "chi1":"32 36 40"
-            "chi2":"28 32 36"
-            "chi3": null
-            "peng": null
-            "gang": null
+            "chi1":"32 36 40",
+            "chi2":"28 32 36",
+            "chi3": null,
+            "peng": null,
+            "gang": null,
             "hu":"0"
         }
 
@@ -115,10 +114,10 @@
         6：胡
     例: {"type":"opereply", "socket_id":22, "room":8, "room_id":1, "content":"0"}
 
-	play		# 他人打牌：服务器发送，content为玩家在房间里的ID和牌ID
+	play		# 客户端打牌：服务器发送，content为玩家在房间里的ID和牌ID
     例: {"type":"play", "room":8, "room_id":1, "player":"2", "card":"66"}
 
-	cpg    	# 他人吃碰杠牌：服务器发送，content为玩家在房间里的ID，和他吃碰杠的三/四张牌的ID(因为是直接显示，所以先不管怎么出)
+	cpg    	# 客户端吃碰杠牌：服务器发送，content为玩家在房间里的ID，和他吃碰杠的三/四张牌的ID(因为是直接显示，所以先不管怎么出)
     例: {"type":"cpg", "room":"8", "room_id":"2", "player":"1", "card":"66 69 73"}
 
 	hu     	# 他人胡牌：服务器发送
