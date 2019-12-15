@@ -15,10 +15,10 @@ class Room:
         self.state.changeToNextState(reply)
 
     def addUser(self, user):
-        for u in self.user_list:
-            if u is None:
-                u = user
-                user.room_id = self.user_list.index(u) + 1
+        for i in range(len(self.user_list)):
+            if self.user_list[i] is None:
+                self.user_list[i] = user
+                user.room_id = i + 1
                 break
 
     def removeUser(self, user_room_id):
