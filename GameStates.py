@@ -51,7 +51,7 @@ class WaitReadyState(State):
             self.room.removeUser(reply["room_id"])
 
         # edit the json
-        roominfoupdate = {"type": "roominfo", "room": self.room.room_id, "room_id": None, "name": "", "ready": ""}
+        roominfoupdate = {"type": "roominfo", "room": str(self.room.room_id), "room_id": None, "name": "", "ready": ""}
         for i in self.room.user_list:
             if i is None:
                 roominfoupdate["name"] += '_ '
@@ -69,10 +69,11 @@ class WaitReadyState(State):
         if self.room.checkReady() is True:
             self.room.createGame()
             self.room.assignInitCard()
-            carddata = {"type": "initcard", "room": self.room.room_id, "room_id": None, "content": ""}
+            carddata = {"type": "initcard", "room": str(self.room.room_id), "room_id": None, "content": ""}
             for i in range(1, 5):
                 for c in self.room.getHand(i):
                     carddata["content"] += str(c) + ' '
+            carddata["content"] = carddata["content"][:-1]
             sendmsgtogether(self.room.user_list, self.server, carddata)
             self.room.drawCard()
             self.room.state = WaitCardState(self.room, self.server)
@@ -91,18 +92,18 @@ class WaitSupervisorState(State):
         if reply["type"] == "supervisor":
             # 需要player对象里有存supervisor的变量
             pass
-        if self.room.supervisorchoice == True:  # 需要有一个检测supervisor是否都选了的方法
+        if self.room.supervisorchoice:  # 需要有一个检测supervisor是否都选了的方法
 
             # init 9 cards for 4 players
             self.room.assignInitCard()
-            carddata = {"type": "initcard", "room": self.room.room_id, "room_id": None, "content": ""}
+            carddata = {"type": "initcard", "room": str(self.room.room_id), "room_id": None, "content": ""}
             for i in range(1, 5):
                 for c in self.room.getHand(i):
                     carddata["content"] += str(c) + ' '
             sendmsgtogether(self.room.user_list, self.server, carddata)
 
             # get pairs of cards then go to next state
-            pairdata = {"type": "pair", "room": self.room.room_id, "room_id": None, "content": ""}
+            pairdata = {"type": "pair", "room": str(self.room.room_id), "room_id": None, "content": ""}
             for c in self.room.generateFourPairs():
                 pairdata["content"] += '{} {} '.format(c[0], c[1])
             sendmsgtogether(self.room.user_list, self.server, pairdata)
