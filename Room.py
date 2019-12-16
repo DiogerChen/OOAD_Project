@@ -2,31 +2,30 @@ from Logic import *
 from GameStates import *
 import numpy as np
 
-
 class Room:
-    def __init__(self, room_id):
+    def __init__(self, room_id, server):
         self.room_id = room_id
         self.user_list = [None, None, None, None]
         self.game = None
-        self.state = WaitReadyState(self)
+        self.state = WaitReadyState(self, server)
         self.replies = []
 
     def ChangeToNextState(self, reply):
         self.state.changeToNextState(reply)
 
     def addUser(self, user):
-        for i in range(len(self.user_list)):
-            if self.user_list[i] is None:
-                self.user_list[i] = user
-                user.room_id = i + 1
+        for u in range(0, 4):
+            if self.user_list[u] is None:
+                self.user_list[u] = user
+                user.room_id = u + 1
                 break
 
     def removeUser(self, user_room_id):
-        self.user_list[user_room_id - 1] = None
+        self.user_list[int(user_room_id) - 1] = None
 
     def checkReady(self):
         for u in self.user_list:
-            if u is not None and u.isReady:
+            if u is not None and u.isready is True:
                 pass
             else:
                 return False
@@ -71,7 +70,7 @@ class Room:
         player.recieveCard(card2)
 
     def getHand(self, player_id):
-        player = self.game.id_to_player[player_id-1]
+        player = self.game.id_to_player[player_id]
         result = []
         for card in player.hand:
             result.append(card.card_id)
