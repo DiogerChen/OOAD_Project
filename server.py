@@ -7,7 +7,7 @@ import random
 
 
 class server:
-    serverName = '10.21.49.246'
+    serverName = '10.21.83.79'
     serverPort = 5555
     client = []
     rooms = {}
@@ -62,3 +62,4 @@ class server:
 if __name__ == "__main__":
     s = server()
     s.open()
+
