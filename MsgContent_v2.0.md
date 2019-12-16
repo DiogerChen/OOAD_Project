@@ -35,6 +35,9 @@
 	joinroom		# 进入房间: 客户端发送，这个时候的room就是要加入的房间号，content为自己的名字，客户端需要根据回复的roominfo来存一下自己的的房间号和房间内的ID(1,2,3,4)
     例: {"type":"joinroom", "socket_id":"23", "room":"-1", "room_id":"-1", "content":"8"}
 
+    roomnotfound    # 房间不存在: 服务器发送
+    例: {"type":"roomnotfound"}
+    
 	ready   		# 游戏准备: 客户端发送，content为空。当同一房间四个同样的ready消息发出，服务器才会开始这个房间的游戏
     例: {"type":"ready", "socket_id":"23", "room":"8", "room_id":"2", "content":null}
 

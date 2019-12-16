@@ -4,6 +4,7 @@ class User:
         self.room = 0
         self.room_id = 0
         self.isready = False
+        self.name = ''
 
     def setName(self, name):
         self.name = name
