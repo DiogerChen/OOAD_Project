@@ -162,6 +162,14 @@ class Room:
     def checkHu(self, player_id):
         player = self.game.id_to_player[player_id]
         return player.checkHu()
+    
+    def checkWillHu(self, player_id, card_id):
+        player = self.game.id_to_player[player_id]
+        card = self.game.id_to_card[card_id]
+        player.recieveCard(card)
+        result = player.checkHu()
+        player.hand.remove(card)
+        return result
 
     def Hu(self, player_id):
         # calculate score
