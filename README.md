@@ -12,12 +12,28 @@
 ## 运行
 - 命令提示符/终端 输入 *python3 server.py* 即可运行
 
-## 工程主体文件:
+## 工程结构
 - [server.py](https://github.com/DiogerChen/OOAD_Project/blob/master/server.py)
     - [Room.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Room.py)
         - [GameStates.py](https://github.com/DiogerChen/OOAD_Project/blob/master/GameStates.py)
         - [Logic.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Logic.py)
         - [User.py](https://github.com/DiogerChen/OOAD_Project/blob/master/User.py)
+
+### 其他文件
+- [Server](https://github.com/DiogerChen/OOAD_Project/tree/master/Server)
+    - [client.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Server/client.py)   
+    自建简单服务器时，创建的简单的客户端用于测试可用性
+
+- Logs  
+    服务器初次运行时会建立该文件夹，并在其目录下存放每次运行的日志文件。文件[.gitignore](https://github.com/DiogerChen/OOAD_Project/blob/master/.gitignore)中已将该文件夹忽略
+
+## 文档
+- [MsgContent_v2.0.md](https://github.com/DiogerChen/OOAD_Project/blob/master/MsgContent_v2.0.md)  
+目前作为参考的前后端通信规则文档
+
+- ~~[MsgContent.md](https://github.com/DiogerChen/OOAD_Project/blob/master/MsgContent.md)~~  
+已经弃用的第一代文档，在制定目前使用的文档时作为重要参考
+
 
 ## 服务器端实现清单
  - [x] 房间的创建，加入，以及房间内人员情况(准备，离开)的实时更新
