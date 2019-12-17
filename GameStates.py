@@ -2,6 +2,7 @@ from Room import *
 from User import *
 import time
 
+
 roominfoupdata = {"type": "roominfo", "room": None, "room_id": None, "name": "", "ready": ""}
 carddata = {"type": "initcard", "room": None, "room_id": None, "content": ""}
 pairdata = {"type": "pair", "room": None, "room_id": None, "content": ""}
@@ -58,6 +59,8 @@ class WaitReadyState(State):
         # edit the json
 
         roominfoupdata["room"] = str(self.room.room_id)
+        roominfoupdata["name"] = ""
+        roominfoupdata["ready"] = ""
         for i in self.room.user_list:
             if i is None:
                 roominfoupdata["name"] += '_ '
@@ -78,6 +81,7 @@ class WaitReadyState(State):
             self.room.createGame()
             self.room.assignInitCard()
             carddata["room"] = str(self.room.room_id)
+            carddata["content"] = ""
             for i in range(1, 5):
                 for c in self.room.getHand(i):
                     carddata["content"] += str(c) + ' '
@@ -104,6 +108,7 @@ class WaitSupervisorState(State):
             # init 9 cards for 4 players
             self.room.assignInitCard()
             carddata["room"] = str(self.room.room_id)
+            carddata["content"] = ""
             for i in range(1, 5):
                 for c in self.room.getHand(i):
                     carddata["content"] += str(c) + ' '
@@ -112,6 +117,7 @@ class WaitSupervisorState(State):
             # get pairs of cards then go to next state
             self.room.paircards = self.room.generateFourPairs()
             pairdata["room"] = str(self.room.room_id)
+            pairdata["content"] = ""
             for c in self.room.paircards:
                 pairdata["content"] += '{} {} '.format(c[0], c[1])
             pairdata["content"] = pairdata["content"][:-1]
@@ -245,7 +251,7 @@ class WaitSpecailReplyState(State):
     def changeToNextState(self, reply):
         self.room.replies.append(reply)
         if len(self.room.replies) == 4:
-            highestchoice = 0  # 需要一个方法根据操作的优先级和编号来决定操作由谁做
+            highestchoice = 0               # 需要一个方法根据操作的优先级和编号来决定操作由谁做
             for r in self.room.replies:
                 pass
 

@@ -3,6 +3,10 @@ import socket
 import threading
 import json
 import random
+import datetime
+import logging
+import os
+
 
 class server:
     serverName = '10.21.77.30'
@@ -15,8 +19,9 @@ class server:
             data = clientsock.recv(2048)
             if data:
                 data = json.loads(data.decode('utf-8'))
-                print(data)
-                if "code" in data:
+                print("Client send: " + str(data))
+                logging.debug("Client send: " + str(data))
+                if data["type"] == "quitGame":
                     clientsock.close()
                     print('connection closed')
                     return
@@ -55,11 +60,19 @@ class server:
 
     def send(self, who, data):
         data = json.dumps(data)
-        print(data)
+        print("Server send: " + str(data))
+        logging.debug("Server send: " + str(data))
         self.client[who-1].send(data.encode('utf-8'))
 
 
 if __name__ == "__main__":
+    if not os.path.exists("Logs"):
+        os.makedirs("Logs")
+    logging.basicConfig(
+        level=logging.DEBUG,  # 定义输出到文件的log级别，大于此级别的都被输出
+        format="%(message)s",  # 定义输出log的格式
+        filename=datetime.datetime.now().strftime('Logs/%Y-%m-%d_%H-%M-%S.txt'),
+        filemode='w')
+
     s = server()
     s.open()
-
