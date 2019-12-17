@@ -13,11 +13,11 @@
 - 命令提示符/终端 输入 *python3 server.py* 即可运行
 
 ## 工程主体文件:
-    [GitStates.py](https://github.com/DiogerChen/OOAD_Project/blob/master/GameStates.py)
-    [Logic.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Logic.py)
-    [Room.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Room.py)
-    [server.py](https://github.com/DiogerChen/OOAD_Project/blob/master/server.py)
-    [User.py](https://github.com/DiogerChen/OOAD_Project/blob/master/User.py)
+- [server.py](https://github.com/DiogerChen/OOAD_Project/blob/master/server.py)
+    - [Room.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Room.py)
+        - [GameStates.py](https://github.com/DiogerChen/OOAD_Project/blob/master/GameStates.py)
+        - [Logic.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Logic.py)
+        - [User.py](https://github.com/DiogerChen/OOAD_Project/blob/master/User.py)
 
 ## 服务器端实现清单
  - [x] 房间的创建，加入，以及房间内人员情况(准备，离开)的实时更新
