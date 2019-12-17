@@ -123,5 +123,8 @@
 	cpg    	# 客户端吃碰杠牌：服务器发送，content为玩家在房间里的ID，和他吃碰杠的三/四张牌的ID(因为是直接显示，所以先不管怎么出)
     例: {"type":"cpg", "room":"8", "room_id":"2", "player":"1", "card":"66 69 73"}
 
-	hu     	# 他人胡牌：服务器发送
-    例: {"type":"hu", "room":"8", "room_id":"2", "player":"1"}
+	hu     	# 他人胡牌：服务器发送给其他所有玩家，"player"就是和牌玩家，"score"就是总分，"content"就是胡的牌型
+    例: {"type":"hu", "room":"8", "room_id":"2", "player":"1", "score"："3000", "content": "段幺+1000 平胡+1000 退课警告+1000"}
+
+    end     # 结束游戏：服务器发送给其他所有玩家，"player"是玩家由高到低的分数，"score"是对应的分数
+    例: {"type":"end", "room":"8", "room_id":"2", "player":"c a b d", "score": "1000 800 790 20"}

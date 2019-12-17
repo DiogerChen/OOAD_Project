@@ -1,13 +1,11 @@
-from User import *
 from Room import *
 import socket
 import threading
 import json
 import random
 
-
 class server:
-    serverName = '10.21.83.79'
+    serverName = '10.21.77.30'
     serverPort = 5555
     client = []
     rooms = {}
@@ -27,7 +25,8 @@ class server:
                     self.rooms[roomid] = Room(roomid, self)
                     self.rooms[roomid].addUser(User(data["socket_id"]))
                     self.rooms[roomid].user_list[0].setName(data["content"])
-                    roominfodic = {"type":"roominfo", "room": str(roomid),"room_id": 1,"name":data["content"]+" _ _ _", "ready":"0 0 0 0"}
+                    roominfodic = {"type":"roominfo", "room": str(roomid),"room_id": 1,
+                                   "name":data["content"]+" _ _ _", "ready":"0 0 0 0"}
                     self.send(int(data["socket_id"]), roominfodic)
                 else:
                     if int(data["room"]) in self.rooms.keys():
