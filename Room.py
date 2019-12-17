@@ -9,6 +9,8 @@ class Room:
         self.game = None
         self.state = WaitReadyState(self, server)
         self.replies = []
+        self.orders = []
+        self.selectround = 1
 
     def ChangeToNextState(self, reply):
         self.state.changeToNextState(reply)

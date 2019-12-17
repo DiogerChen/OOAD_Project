@@ -78,7 +78,7 @@
 
     score           # 提交积分: 客户端发送，content为数字1~4(共5分)
 
-    askchoice       # 请求选择: 服务器发送，content为空
+    askchoice       # 请求选择: 服务器发送，content为需要做出选择的玩家房间ID。别的玩家可以根据个ID更新UI
 
     choice          # 提交选择：客户端发送，content为那对牌的index
 
