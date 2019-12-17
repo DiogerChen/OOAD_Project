@@ -9,6 +9,8 @@ class Room:
         self.game = None
         self.state = WaitReadyState(self, server)
         self.replies = []
+        self.paircards = []
+        self.supervisorchoice = {}
         self.orders = []
         self.selectround = 1
 

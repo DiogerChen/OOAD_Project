@@ -2,7 +2,6 @@ from Logic import *
 from Room import *
 from User import *
 import json
-import time
 import random
 
 
@@ -76,7 +75,7 @@ class WaitReadyState(State):
             carddata["content"] = carddata["content"][:-1]
             sendmsgtogether(self.room.user_list, self.server, carddata)
             self.room.drawCard()
-            self.room.state = WaitCardState(self.room, self.server)
+            self.room.state = WaitSupervisorState(self.room, self.server)
 
 
 class WaitSupervisorState(State):
@@ -90,10 +89,10 @@ class WaitSupervisorState(State):
 
     def changeToNextState(self, reply):
         if reply["type"] == "supervisor":
-            # 需要player对象里有存supervisor的变量
-            pass
-        if self.room.supervisorchoice:  # 需要有一个检测supervisor是否都选了的方法
-
+            self.room.replies.append(reply)
+        if len(self.room.replies) == 4:
+            for c in self.room.replies:
+                self.room.supervisorchoice[c["room_id"]] = int(c["content"])
             # init 9 cards for 4 players
             self.room.assignInitCard()
             carddata = {"type": "initcard", "room": str(self.room.room_id), "room_id": None, "content": ""}
@@ -103,8 +102,9 @@ class WaitSupervisorState(State):
             sendmsgtogether(self.room.user_list, self.server, carddata)
 
             # get pairs of cards then go to next state
+            self.room.paircards = self.room.generateFourPairs()
             pairdata = {"type": "pair", "room": str(self.room.room_id), "room_id": None, "content": ""}
-            for c in self.room.generateFourPairs():
+            for c in self.room.paircards:
                 pairdata["content"] += '{} {} '.format(c[0], c[1])
             sendmsgtogether(self.room.user_list, self.server, pairdata)
 
@@ -118,16 +118,18 @@ class WaitScoreState(State):
     def __init__(self, room, server):
         self.room = room
         self.server = server
-        self.room.replies = []  # need to use it store 4 replies
+        self.room.replies = {}
+        self.room.orders = []
 
     def changeToNextState(self, reply):
-        if reply["type"] == "supervisor":
-            self.room.replies.append(reply)
-            # 这里我还需要根据下面需要的的内容再改
-
+        if reply["type"] == "score":
+            self.room.replies[reply["room_id"]] = reply["content"]
         if len(self.room.replies) == 4:
-            # 需要有一个根据积分排出先后顺序的方法，并且需要一个长度为8的数组(可以暂定为chooseorder)记录这个顺序(顺序是一个回文)
+            self.room.orders = sorted(self.room.replies.items(), key=lambda e: e[1])
             self.room.state = WaitPairChoiceState(self.room, self.server)
+
+            askdata = {"type": "askchoice", "room": str(self.room.room_id), "room_id": None, "content": str(self.room.orders[0])}
+            sendmsgtogether(self.room.user_list, self.server, askdata)
 
 
 class WaitPairChoiceState(State):
@@ -137,26 +139,42 @@ class WaitPairChoiceState(State):
     def __init__(self, room, server):
         self.room = room
         self.server = server
-        self.selectround = 0  # there are 8 rounds in choose pairs, this is a counter to record the round
+        self.room.replies = []
 
     def changeToNextState(self, reply):
+        playdata = {"type": "play", "room": str(self.room.room_id), "room_id": None, "player": None, "card": None}
         if reply["type"] == "choice":
-            # 仍需敲定细节
-            self.selectround += 1
-            # sendmsgtogether
-        if self.selectround == 8:
-            self.room.state = WaitCardState()  ###
+            playdata["player"] = reply["room_id"]
+            pair = self.room.paircards[reply["content"]]
+            playdata["card"] = "{} {}".format(pair[0], pair[1])
+            self.room.assignPair(int(reply["room_id"]),pair)
+            sendmsgtogether(self.room.user_list, self.server, playdata)
+
+            if len(self.room.orders) > 1:
+                self.room.orders = self.room.orders[1:0]
+                askdata = {"type": "askchoice", "room": str(self.room.room_id), "room_id": None, "content": str(self.room.orders[0])}
+                sendmsgtogether(self.room.user_list, self.server, askdata)
+            else:
+                if self.room.selectround == 1:
+                    self.room.selectround += 1
+                    self.room.state = WaitScoreState(self.room, self.server)
+                else:
+                    self.room.drawCard()
+                    # 暂不考虑开始就自摸的情况
+                    self.room.state = WaitCardState(self.room, self.server)
 
 
 class WaitCardState(State):
     def __str__(self):
-        return "Waiting for a card from player"
+        return "Waiting for a card from players"
 
     def __init__(self, room, server):
         self.room = room
         self.server = server
+        self.room.replies = []
 
     def changeToNextState(self, reply):
+
         self.room.playCard(reply["content"][0])
         result = self.room.checkAll(reply["content"][0])
         specialoperationflag = False
