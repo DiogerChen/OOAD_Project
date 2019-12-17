@@ -74,7 +74,6 @@ class WaitReadyState(State):
                     carddata["content"] += str(c) + ' '
             carddata["content"] = carddata["content"][:-1]
             sendmsgtogether(self.room.user_list, self.server, carddata)
-            self.room.drawCard()
             self.room.state = WaitSupervisorState(self.room, self.server)
 
 
@@ -161,6 +160,7 @@ class WaitPairChoiceState(State):
                 else:
                     self.room.drawCard()
                     # 暂不考虑开始就自摸的情况
+                    self.room.drawCard()
                     self.room.state = WaitCardState(self.room, self.server)
 
 
