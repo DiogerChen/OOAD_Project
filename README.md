@@ -20,8 +20,8 @@
         - [User.py](https://github.com/DiogerChen/OOAD_Project/blob/master/User.py)
 
 ### 其他文件
-- [Server](https://github.com/DiogerChen/OOAD_Project/tree/master/Server)
-    - [client.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Server/client.py)   
+- ~~[Server](https://github.com/DiogerChen/OOAD_Project/tree/master/Server)~~
+    - ~~[client.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Server/client.py)~~   
     自建简单服务器时，创建的简单的客户端用于测试可用性，目前已弃用
 
 - Logs  
