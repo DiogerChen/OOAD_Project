@@ -9,7 +9,7 @@ def sendmsgtogether(userlist, server, data):
     for i in userlist:
         if i is not None:
             data["room_id"] = str(i.room_id)
-            server.send(int(i.socket_id), json.dumps(data).encode('utf-8'))
+            server.send(int(i.socket_id), data)
 
 
 '''状态模式'''
@@ -209,7 +209,7 @@ class WaitCardState(State):
                                                               result[i][5][3])
             if result[i][6] == 1:
                 specialopedata["hu"] = "1"
-            self.server.send(self.room.user_list[i].socket_id, json.dumps(specialopedata).encode('utf-8'))
+            self.server.send(self.room.user_list[i].socket_id, specialopedata)
 
         if specialoperationflag == True:
             self.room.replies = []
@@ -221,7 +221,7 @@ class WaitCardState(State):
                     hurequest = {"type": "specialope", "socket_id": 0, "room": str(self.room.room_id),
                                  "room_id": str(self.room.currentplayer), "chi1": None, "chi2": None, "chi3": None,
                                  "peng": None, "gang": None, "hu": "1"}
-                    self.server.send(self.room.user_list[i].socket_id, json.dumps(hurequest).encode('utf-8'))
+                    self.server.send(self.room.user_list[i].socket_id, hurequest)
                     self.room.state = WaitZimoState(self.room, self.server)
                 else:
                     self.room.state = WaitCardState(self.room, self.server)

@@ -28,12 +28,12 @@ class server:
                     self.rooms[roomid].addUser(User(data["socket_id"]))
                     self.rooms[roomid].user_list[0].setName(data["content"])
                     roominfodic = {"type":"roominfo", "room": str(roomid),"room_id": 1,"name":data["content"]+" _ _ _", "ready":"0 0 0 0"}
-                    self.send(int(data["socket_id"]), json.dumps(roominfodic).encode('utf-8'))
+                    self.send(int(data["socket_id"]), roominfodic)
                 else:
                     if int(data["room"]) in self.rooms.keys():
                         self.rooms[int(data["room"])].state.changeToNextState(data)
                     else:
-                        self.send(int(data["socket_id"]), json.dumps({"type": "roomnotfound"}).encode('utf-8'))
+                        self.send(int(data["socket_id"]), {"type": "roomnotfound"})
             else:
                 clientsock.close()
                 print('connection closed')
@@ -48,15 +48,16 @@ class server:
             clientsock, address = serversock.accept()
             self.client.append(clientsock)
             iddic = {"type": "id", "room":"-1","room_id":"-1","content":str(len(self.client))}
-            self.send(len(self.client), json.dumps(iddic).encode('utf-8'))
+            self.send(len(self.client), iddic)
             print(address)
             print("a client has been connected")
             new_thread = threading.Thread(target=self.receive, args=(clientsock,))
             new_thread.start()
 
     def send(self, who, data):
+        data = json.dumps(data)
         print(data)
-        self.client[who-1].send(data)
+        self.client[who-1].send(data.encode('utf-8'))
 
 
 if __name__ == "__main__":
