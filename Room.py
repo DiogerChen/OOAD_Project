@@ -112,6 +112,7 @@ class Room:
     def drawCard(self):
         card = self.game.popCard()
         self.game.current_player.recieveCard(card)
+        return card
 
     def playCard(self, card_id):
         card = self.game.id_to_card[card_id]

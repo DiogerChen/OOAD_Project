@@ -35,7 +35,7 @@ class server:
                     self.send(int(data["socket_id"]), roominfodic)
                 else:
                     if int(data["room"]) in self.rooms.keys():
-                        self.rooms[int(data["room"])].state.changeToNextState(data)
+                        self.rooms[int(data["room"])].ChangeToNextState(data)
                     else:
                         self.send(int(data["socket_id"]), {"type": "roomnotfound"})
             else:
