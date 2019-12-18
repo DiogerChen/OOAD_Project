@@ -21,8 +21,10 @@
 
 ### 其他文件
 - ~~[Server](https://github.com/DiogerChen/OOAD_Project/tree/master/Server)~~
+    - ~~[server.py](https://github.com/DiogerChen/OOAD_Project/tree/master/Server/server.py)~~   
+    早期自建的简易多线程服务器，目前主目录下的[server.py](https://github.com/DiogerChen/OOAD_Project/blob/master/server.py)沿用了该文件的大部分内容
     - ~~[client.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Server/client.py)~~   
-    自建简单服务器时，创建的简单的客户端用于测试可用性，目前已弃用
+    自建的简易客户端，用于测试服务器可用性，目前已弃用
 
 - Logs  
     服务器初次运行时会建立该文件夹，并在其目录下存放每次运行的日志文件。文件[.gitignore](https://github.com/DiogerChen/OOAD_Project/blob/master/.gitignore)中已将该文件夹忽略
