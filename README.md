@@ -1,7 +1,7 @@
 # The Server part in Mahjong Game of OOAD Project
 
 ## 介绍
-- 一个使用Python搭建的，利用Socket通讯，应用于课程面向对象设计基础Project麻将游戏的简易服务器
+- 一个使用Python搭建的，利用Socket通讯，应用于课程面向对象设计基础Project麻将游戏的简易多线程服务器
 - 主要逻辑判断均在该服务器上进行，并且使用状态模式更新游戏进度
 - 前端链接: [SUSTechMahjong](https://github.com/Pino444/SUSTechMahjong)
 
@@ -10,7 +10,9 @@
 - Windows/Linux/MacOS
 
 ## 运行
-- 命令提示符/终端 输入 *python3 server.py* 即可运行
+- 命令提示符 输入ipconfig /终端 输入 ifconfig 后获得IP地址，修改[server.py](https://github.com/DiogerChen/OOAD_Project/blob/master/server.py)中server类下的servername为服务器IP地址
+- 命令提示符/终端 输入 *python3 server.py* 打开服务器
+- 请确保客户端与服务器在同一网络下运行，之后打开游戏客户端，输入服务器IP地址，进行连接
 
 ## 工程结构
 - [server.py](https://github.com/DiogerChen/OOAD_Project/blob/master/server.py)
