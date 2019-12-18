@@ -15,21 +15,21 @@ class Room:
         self.selectround = 1
 
     def ChangeToNextState(self, reply):
-        self.state.changeToNextState(reply)
+        self.state.ChangeToNextState(reply)
 
     def addUser(self, user):
-        for u in range(0, 4):
-            if self.user_list[u] is None:
-                self.user_list[u] = user
-                user.room_id = u + 1
+        for i in range(len(self.user_list)):
+            if self.user_list[i] is None:
+                self.user_list[i] = user
+                user.room_id = i + 1
                 break
 
     def removeUser(self, user_room_id):
-        self.user_list[int(user_room_id) - 1] = None
+        self.user_list[user_room_id - 1] = None
 
     def checkReady(self):
         for u in self.user_list:
-            if u is not None and u.isready:
+            if u is not None and u.isReady:
                 pass
             else:
                 return False
@@ -43,7 +43,36 @@ class Room:
         self.game = Game(colleges[0], colleges[1])
         return colleges
 
+    def setCalculator(self, player_id, college_id, skill_id):
+        player = self.game.id_to_player[player_id]
+        huCalculator = HuCalculator(None)
+        huCalculator.setPlayer(player)
+        if college_id == 1:
+            huCalculator = ZhiRenCalculator(huCalculator)
+        elif college_id == 2:
+            huCalculator = ShuRenCalculator(huCalculator)
+        elif college_id == 3:
+            huCalculator = ZhiChengCalculator(huCalculator)
+        elif college_id == 4:
+            huCalculator = ShuDeCalculator(huCalculator)
+        elif college_id == 5:
+            huCalculator = ZhiXinCalculator(huCalculator)
+        elif college_id == 6:
+            huCalculator = ShuLiCalculator(huCalculator)
+        if skill_id == 1:
+            huCalculator = OJCalculator(huCalculator)
+        elif skill_id == 2:
+            huCalculator = TongShiCalculator(huCalculator)
+        elif skill_id == 3:
+            huCalculator = QiPaiCalculator(huCalculator)
+        elif skill_id == 4:
+            huCalculator = CPGCalculator(huCalculator)
+        huCalculator = SpecialCaseCalcultor(huCalculator)
+        player.huCalculator = huCalculator
+
     def nextPlayer(self):
+        print(self.game.current_player)
+        print(self.game.remaining_player_list)
         index = self.game.remaining_player_list.index(self.game.current_player)
         if index == len(self.game.remaining_player_list) - 1:
             self.game.current_player = self.game.remaining_player_list[0]
@@ -81,7 +110,6 @@ class Room:
         return result
 
     def drawCard(self):
-        # current_player抽一张卡。每回合结束时，应当先调用nextPlayer()，再drawCard()
         card = self.game.popCard()
         self.game.current_player.recieveCard(card)
 
@@ -156,13 +184,26 @@ class Room:
         player = self.game.id_to_player[player_id]
         discard = self.game.id_to_card[discard_id]
         player.Gang(discard)
-        # 杠与胡都需要暂时把current_player设成上家，以便nextPlayer()可以返还正确的next player
         self.game.current_player = player
 
     def checkHu(self, player_id):
         player = self.game.id_to_player[player_id]
-        return player.checkHu()
-    
+        huable = player.checkHu()
+        return huable
+
+    def earlyHu(self, player):
+        if len(self.game.remaining_player_list) == 4:
+            player.score += 5000
+            player.hu_discription += ' 第一个胡+5000'
+        elif len(self.game.remaining_player_list) == 3:
+            player.score += 2000
+            player.hu_discription += ' 第二个胡+2000'
+        elif len(self.game.remaining_player_list) == 2:
+            player.score += 1000
+            player.hu_discription += ' 第三个胡+1000'
+        else:
+            player.hu_discription += ' 第四个胡+0'
+
     def checkWillHu(self, player_id, card_id):
         player = self.game.id_to_player[player_id]
         card = self.game.id_to_card[card_id]
@@ -174,14 +215,22 @@ class Room:
     def Hu(self, player_id):
         # calculate score
         player = self.game.id_to_player[player_id]
+        player.huCalculator.calculate()
+        self.earlyHu(player)
         if len(self.game.remaining_player_list) > 1:
+            self.nextPlayer()
             self.game.remaining_player_list.remove(player)
-            self.nextPlayer()
-        else:
-            self.nextPlayer()
+
+    def getScore(self, player_id):
+        player = self.game.id_to_player[player_id]
+        return player.score
+
+    def getHuDiscription(self, player_id):
+        player = self.game.id_to_player[player_id]
+        return player.hu_discription
 
     def checkAll(self, card_id):
-        # result[0]中依次是player1的：chiable,choices,pengable,first_two_same,gangable,first_three_same,huable
+        # result[0]中依次是player1的：chiable,choices,penable,first_two_same,gangable,first_three_same,huable
         # 如果该player2已经胡了，则result[1]为None
         result = [[], [], [], []]
         card = self.game.id_to_card[card_id]
