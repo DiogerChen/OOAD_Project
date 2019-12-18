@@ -25,6 +25,10 @@ class server:
                     clientsock.close()
                     print('connection closed')
                     return
+                if data["type"] == "quitGame":
+                    clientsock.close()
+                    print('connection closed')
+                    return
                 if data["type"] == "create":
                     roomid = random.randint(1000,9999)
                     self.rooms[roomid] = Room(roomid, self)

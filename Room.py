@@ -29,7 +29,7 @@ class Room:
 
     def checkReady(self):
         for u in self.user_list:
-            if u is not None and u.isReady:
+            if u is not None and u.isready:
                 pass
             else:
                 return False

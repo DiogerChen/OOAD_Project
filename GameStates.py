@@ -1,5 +1,6 @@
 from Room import *
 from User import *
+import logging
 import time
 
 
@@ -25,11 +26,14 @@ def sendmsgtogether(userlist, server, data):
 '''状态模式'''
 class State:
     def __str__(self):
-        return "This is a Main State Class"
+        return "----- Main State Class -----"
 
     def __init__(self, room, server):
         self.room = room
         self.server = server
+        self.room.replies = []
+        print(str(self))
+        logging.debug(str(self))
 
     def ChangeToNextState(self, reply):
         # 需要一个服务器每次收到消息都执行ChangeToNextState()的方法
@@ -38,11 +42,10 @@ class State:
 
 class WaitReadyState(State):
     def __str__(self):
-        return "Waiting for the ready reply"
+        return "----- Wait Ready State -----"
 
     def __init__(self, room, server):
-        self.room = room
-        self.server = server
+        super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
         # update according to the reply
@@ -55,10 +58,9 @@ class WaitReadyState(State):
         elif reply["type"] == "cancelready":
             self.room.user_list[int(reply["room_id"]) - 1].setUnready()
         elif reply["type"] == "quitroom":
-            self.room.removeUser(reply["room_id"])
+            self.room.removeUser(int(reply["room_id"]))
 
         # edit the json
-
         roominfoupdata["room"] = str(self.room.room_id)
         roominfoupdata["name"] = ""
         roominfoupdata["ready"] = ""
@@ -93,12 +95,10 @@ class WaitReadyState(State):
 
 class WaitSupervisorState(State):
     def __str__(self):
-        return "Waiting for the choice of the supervisor"
+        return "----- Wait Supervisor Choices State -----"
 
     def __init__(self, room, server):
-        self.room = room
-        self.server = server
-        self.room.replies = []  # need to use it store 4 replies
+        super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
         if reply["type"] == "supervisor":
@@ -120,11 +120,10 @@ class WaitSupervisorState(State):
 
 class WaitScoreState(State):
     def __str__(self):
-        return "Waiting for the choice of the scores"
+        return "----- Wait Scores State -----"
 
     def __init__(self, room, server):
-        self.room = room
-        self.server = server
+        super().__init__(room, server)
         self.room.replies = {}
         self.room.orders = []
 
@@ -141,12 +140,10 @@ class WaitScoreState(State):
 
 class WaitPairChoiceState(State):
     def __str__(self):
-        return "Waiting for the choice of the card pairs"
+        return "----- Wait Pair Choices State -----"
 
     def __init__(self, room, server):
-        self.room = room
-        self.server = server
-        self.room.replies = []
+        super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
         carddata["room"] = str(self.room.room_id)
@@ -185,12 +182,10 @@ class WaitPairChoiceState(State):
 
 class WaitCardState(State):
     def __str__(self):
-        return "Waiting for a card from players"
+        return "----- Wait Card Play State -----"
 
     def __init__(self, room, server):
-        self.room = room
-        self.server = server
-        self.room.replies = []
+        super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
         self.room.playCard(reply["content"][0])
@@ -249,11 +244,10 @@ class WaitCardState(State):
 
 class WaitSpecailReplyState(State):
     def __str__(self):
-        return "Waiting for the reply/replies of specail operation"
+        return "----- Wait Special Operation Replies State -----"
 
     def __init__(self, room, server):
-        self.room = room
-        self.server = server
+        super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
         self.room.replies.append(reply)
@@ -264,11 +258,10 @@ class WaitSpecailReplyState(State):
 
 class WaitZimoState(State):
     def __str__(self):
-        return "Waiting for a reply of Zi Mo"
+        return "----- Wait Zimo Reply State -----"
 
     def __init__(self, room, server):
-        self.room = room
-        self.server = server
+        super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
         if reply["hu"] is None:
