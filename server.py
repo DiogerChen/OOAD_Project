@@ -9,7 +9,7 @@ import os
 
 
 class server:
-    serverName = '10.21.77.30'
+    serverName = '10.21.41.131'
     serverPort = 5555
     client = []
     rooms = {}
@@ -21,7 +21,7 @@ class server:
                 data = json.loads(data.decode('utf-8'))
                 print("Client send: " + str(data))
                 logging.debug("Client send: " + str(data))
-                if data["type"] == "quitGame":
+                if 'code' in data:
                     clientsock.close()
                     print('connection closed')
                     return

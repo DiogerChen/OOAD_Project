@@ -4,7 +4,8 @@ import time
 
 
 roominfoupdata = {"type": "roominfo", "room": None, "room_id": None, "name": "", "ready": ""}
-carddata = {"type": "initcard", "room": None, "room_id": None, "content": ""}
+initcarddata = {"type": "initcard", "room": None, "room_id": None, "content": ""}
+carddata = {"type": "card", "room": None, "room_id": None, "content": ""}
 pairdata = {"type": "pair", "room": None, "room_id": None, "content": ""}
 askdata = {"type": "askchoice", "room": None, "room_id": None, "content": None}
 playdata = {"type": "play", "room": None, "room_id": None, "player": None, "card": None}
@@ -80,13 +81,13 @@ class WaitReadyState(State):
         if self.room.checkReady():
             self.room.createGame()
             self.room.assignInitCard()
-            carddata["room"] = str(self.room.room_id)
-            carddata["content"] = ""
+            initcarddata["room"] = str(self.room.room_id)
+            initcarddata["content"] = ""
             for i in range(1, 5):
                 for c in self.room.getHand(i):
-                    carddata["content"] += str(c) + ' '
-            carddata["content"] = carddata["content"][:-1]
-            sendmsgtogether(self.room.user_list, self.server, carddata)
+                    initcarddata["content"] += str(c) + ' '
+            initcarddata["content"] = initcarddata["content"][:-1]
+            sendmsgtogether(self.room.user_list, self.server, initcarddata)
             self.room.state = WaitSupervisorState(self.room, self.server)
 
 
@@ -105,15 +106,6 @@ class WaitSupervisorState(State):
         if len(self.room.replies) == 4:
             for c in self.room.replies:
                 self.room.supervisorchoice[c["room_id"]] = int(c["content"])
-            # init 9 cards for 4 players
-            self.room.assignInitCard()
-            carddata["room"] = str(self.room.room_id)
-            carddata["content"] = ""
-            for i in range(1, 5):
-                for c in self.room.getHand(i):
-                    carddata["content"] += str(c) + ' '
-            sendmsgtogether(self.room.user_list, self.server, carddata)
-
             # get pairs of cards then go to next state
             self.room.paircards = self.room.generateFourPairs()
             pairdata["room"] = str(self.room.room_id)
@@ -138,7 +130,7 @@ class WaitScoreState(State):
 
     def changeToNextState(self, reply):
         if reply["type"] == "score":
-            self.room.replies[reply["room_id"]] = reply["content"]
+            self.room.replies[reply["room_id"]] = int(reply["content"])
         if len(self.room.replies) == 4:
             self.room.orders = sorted(self.room.replies.items(), key=lambda e: e[1], reverse=True)
             self.room.state = WaitPairChoiceState(self.room, self.server)
@@ -157,26 +149,34 @@ class WaitPairChoiceState(State):
         self.room.replies = []
 
     def changeToNextState(self, reply):
-        playdata["room"] = str(self.room.room_id)
+        carddata["room"] = str(self.room.room_id)
         if reply["type"] == "choice":
-            playdata["player"] = reply["room_id"]
-            pair = self.room.paircards[reply["content"]]
-            playdata["card"] = "{} {}".format(pair[0], pair[1])
-            self.room.assignPair(int(reply["room_id"]),pair)
-            sendmsgtogether(self.room.user_list, self.server, playdata)
+            carddata["player"] = reply["room_id"]
+            pair = self.room.paircards[int(reply["content"]) - 1]
+            carddata["content"] = "{} {}".format(pair[0], pair[1])
+            self.room.assignPair(int(reply["room_id"]), pair)
+            sendmsgtogether(self.room.user_list, self.server, carddata)
 
             if len(self.room.orders) > 1:
-                self.room.orders = self.room.orders[1:0]
+                self.room.orders = self.room.orders[1:]
                 askdata["room"] = str(self.room.room_id)
                 askdata["content"] = str(self.room.orders[0][0])
                 sendmsgtogether(self.room.user_list, self.server, askdata)
             else:
                 if self.room.selectround == 1:
                     self.room.selectround += 1
+                    self.room.paircards = self.room.generateFourPairs()
+                    pairdata["room"] = str(self.room.room_id)
+                    pairdata["content"] = ""
+                    for c in self.room.paircards:
+                        pairdata["content"] += '{} {} '.format(c[0], c[1])
+                    pairdata["content"] = pairdata["content"][:-1]
+                    sendmsgtogether(self.room.user_list, self.server, pairdata)
+
                     self.room.state = WaitScoreState(self.room, self.server)
                 else:
                     self.room.drawCard()
-                    # 暂不考虑开始就自摸的情况
+                    d
                     self.room.state = WaitCardState(self.room, self.server)
 
 
@@ -230,6 +230,7 @@ class WaitCardState(State):
             self.room.state = WaitSpecailReplyState(self.room, self.server)
         else:
             self.room.drawCard()
+
             for i in range(1, 5):
                 if self.room.checkHu(i):
                     hurequest["room"] = str(self.room.room_id)
@@ -254,7 +255,6 @@ class WaitSpecailReplyState(State):
             highestchoice = 0               # 需要一个方法根据操作的优先级和编号来决定操作由谁做
             for r in self.room.replies:
                 pass
-
 
 class WaitZimoState(State):
     def __str__(self):
