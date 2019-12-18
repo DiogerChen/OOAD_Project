@@ -1,7 +1,8 @@
 import random
 import numpy as np
 
-type_hash = {'wan': 0, 'tiao': 1, 'bin': 2, 'dong': 3, 'xi': 4, 'nan': 5, 'bei': 6, 'bai': 7, 'fa': 8, 'zhong': 9}
+
+# type_hash = {'wan': 0, 'tiao': 1, 'bin': 2, 'zhiren':3, 'shuren':4, 'zhicheng':5, 'shude':6, 'zhixin':7, 'shuli':8, 'bai':9, 'fa':10, 'zhong':11}
 
 
 class Game:
@@ -89,6 +90,8 @@ class Player:
         self.expose_area = []
         self.discard_area = []
         self.score = 0
+        self.hu_discription = ''
+        self.huCalculator = None
 
     def recieveCard(self, received_card):
         self.hand.append(received_card)
@@ -120,10 +123,8 @@ class Player:
                             if triple[0].card_type == triple[1].card_type == triple[2].card_type and (
                                     triple[0].card_num == triple[1].card_num == triple[2].card_num
                                     or triple[0].card_num + 2 == triple[1].card_num + 1 == triple[2].card_num):
-                                # print(triple[0], triple[1], triple[2], 'triple success')
                                 triple = []
                             else:
-                                # print(triple[0], triple[1], triple[2], 'triple failed')
                                 result = False
                                 break
                     if result:
