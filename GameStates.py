@@ -174,7 +174,7 @@ class WaitPairChoiceState(State):
                 else:
                     card = self.room.drawCard()
                     carddata["room"] = str(self.room.room_id)
-                    carddata["player"] = reply["room_id"]
+                    carddata["player"] = "1"
                     carddata["content"] = str(card)
                     sendmsgtogether(self.room.user_list, self.server, carddata)
                     self.room.state = WaitCardState(self.room, self.server)
@@ -188,8 +188,8 @@ class WaitCardState(State):
         super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
-        self.room.playCard(reply["content"][0])
-        result = self.room.checkAll(reply["content"][0])
+        self.room.playCard(int(reply["content"][0]))
+        result = self.room.checkAll(int(reply["content"][0]))
         specialoperationflag = False
         specialopedata["room"] = str(self.room.room_id)
 
@@ -226,16 +226,15 @@ class WaitCardState(State):
         if specialoperationflag:
             self.room.state = WaitSpecailReplyState(self.room, self.server)
         else:
-            self.room.nextPlayer()
             card = self.room.drawCard()
             carddata["room"] = str(self.room.room_id)
-            carddata["player"] = reply["room_id"]
+            carddata["player"] = str(self.room.getCurrentPlayer())
             carddata["content"] = str(card)
             sendmsgtogether(self.room.user_list, self.server, carddata)
             for i in range(1, 5):
                 if self.room.checkHu(i):
                     hurequest["room"] = str(self.room.room_id)
-                    hurequest["room_id"] = str(self.room.currentplayer)
+                    hurequest["room_id"] = str(self.room.getCurrentPlayer())
                     self.server.send(self.room.user_list[i].socket_id, hurequest)
                     self.room.state = WaitZimoState(self.room, self.server)
                 else:
@@ -265,10 +264,9 @@ class WaitZimoState(State):
 
     def ChangeToNextState(self, reply):
         if reply["hu"] is None:
-            self.room.nextPlayer()
             card = self.room.drawCard()
             carddata["room"] = str(self.room.room_id)
-            carddata["player"] = reply["room_id"]
+            carddata["player"] = str(self.room.getCurrentPlayer())
             carddata["content"] = str(card)
             sendmsgtogether(self.room.user_list, self.server, carddata)
             self.room.state = WaitCardState(self.room, self.server)

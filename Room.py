@@ -72,6 +72,9 @@ class Room:
             huCalculator = StableCalculator(huCalculator)
         player.huCalculator = huCalculator
 
+    def getCurrentPlayer(self):
+        return self.game.current_player.player_id
+
     def nextPlayer(self):
         print(self.game.current_player)
         print(self.game.remaining_player_list)
