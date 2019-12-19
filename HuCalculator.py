@@ -248,7 +248,18 @@ class CPGCalculator(HuCalculator):
         self.player.hu_discription += str(bonus)
 
 
-class SpecialCaseCalcultor(HuCalculator):
+class StableCalculator(HuCalculator):
+    def __init__(self, calculator):
+        super().__init__(calculator)
+        self.player = calculator.player
+
+    def calculate(self):
+        self.calculator.calculate()
+        self.player.score += 4000
+        self.player.hu_discription += ' 稳地加分+4000'
+
+
+class SpecialCaseCalculator(HuCalculator):
     def __init__(self, calculator):
         super().__init__(calculator)
         self.player = calculator.player
