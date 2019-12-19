@@ -125,6 +125,7 @@
 
 	hu     	# 他人胡牌：服务器发送给其他所有玩家，"player"就是和牌玩家，"score"就是总分，"content"就是胡的牌型
     例: {"type":"hu", "room":"8", "room_id":"2", "player":"1", "score"："3000", "content": "段幺+1000 平胡+1000 退课警告+1000"}
+    {"type":"hu", "room":"8", "room_id":"2", "player":"player1name", "score"："3000", "content": "段幺+1000 平胡+1000 退课警告+1000","card":"1 2 3 4 5 6 7 8 9 10 11 12 13 14"}
 
     end     # 结束游戏：服务器发送给其他所有玩家，"player"是玩家由高到低的分数，"score"是对应的分数
     例: {"type":"end", "room":"8", "room_id":"2", "player":"c a b d", "score": "1000 800 790 20"}
