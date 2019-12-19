@@ -97,7 +97,6 @@ class Player:
         self.hand.append(received_card)
 
     def playCard(self, discard):
-        print(self.hand[0])
         print(discard)
         self.hand.remove(discard)
         self.discard_area.append(discard)

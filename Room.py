@@ -247,13 +247,13 @@ class Room:
         return player.hu_discription
 
     def checkAll(self, card_id):
-        # result[0]中依次是player1的：chiable,choices,penable,first_two_same,gangable,first_three_same,huable
+        # result[0]中依次是player1的：chiable, choices, penable, first_two_same, gangable, first_three_same, huable
         # 如果该player2已经胡了，则result[1]为None
         result = [[], [], [], []]
         card = self.game.id_to_card[card_id]
         for i in range(1, 5):
             temp = []
-            player = self.game.id_to_player(i)
+            player = self.game.id_to_player[i]
             if player in self.game.remaining_player_list:
                 chiable, choices = self.checkChi(i, card_id)
                 temp.append(chiable)
@@ -269,5 +269,5 @@ class Room:
                 player.hand.remove(card)
             else:
                 temp = None
-            result[i - 1].append(temp)
+            result[i - 1] = temp
         return result

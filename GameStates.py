@@ -188,8 +188,8 @@ class WaitCardState(State):
         super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
-        self.room.playCard(int(reply["content"][0]))
-        result = self.room.checkAll(int(reply["content"][0]))
+        self.room.playCard(int(reply["content"]))
+        result = self.room.checkAll(int(reply["content"]))
         specialoperationflag = False
         specialopedata["room"] = str(self.room.room_id)
 
