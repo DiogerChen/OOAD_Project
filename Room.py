@@ -43,7 +43,7 @@ class Room:
         self.game = Game(colleges[0], colleges[1])
         return colleges
 
-    def setCalculator(self, player_id, college_id, skill_id):
+        def setCalculator(self, player_id, college_id, skill_id):
         player = self.game.id_to_player[player_id]
         huCalculator = HuCalculator(None)
         huCalculator.setPlayer(player)
@@ -59,6 +59,7 @@ class Room:
             huCalculator = ZhiXinCalculator(huCalculator)
         elif college_id == 6:
             huCalculator = ShuLiCalculator(huCalculator)
+        huCalculator = SpecialCaseCalcultor(huCalculator)
         if skill_id == 1:
             huCalculator = OJCalculator(huCalculator)
         elif skill_id == 2:
@@ -67,7 +68,9 @@ class Room:
             huCalculator = QiPaiCalculator(huCalculator)
         elif skill_id == 4:
             huCalculator = CPGCalculator(huCalculator)
-        huCalculator = SpecialCaseCalcultor(huCalculator)
+        elif skill_id == 5:
+            huCalculator = huCalculator.calculator
+            huCalculator = StableCalculator(huCalculator)
         player.huCalculator = huCalculator
 
     def nextPlayer(self):
@@ -107,6 +110,17 @@ class Room:
         result = []
         for card in player.hand:
             result.append(card.card_id)
+        return result
+    
+    def getAllCard(self, player_id):
+        player = self.game.id_to_player[player_id]
+        hand = player.hand
+        exp = player.expose_area
+        result = []
+        for c in player.hand:
+            result.append(c.card_id)
+        for c in player.expose_area:
+            result.append(c.card_id)
         return result
 
     def drawCard(self):
