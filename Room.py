@@ -59,7 +59,7 @@ class Room:
             huCalculator = ZhiXinCalculator(huCalculator)
         elif college_id == 6:
             huCalculator = ShuLiCalculator(huCalculator)
-        huCalculator = SpecialCaseCalcultor(huCalculator)
+        huCalculator = SpecialCaseCalculator(huCalculator)
         if skill_id == 1:
             huCalculator = OJCalculator(huCalculator)
         elif skill_id == 2:
