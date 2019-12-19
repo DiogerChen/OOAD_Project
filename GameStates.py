@@ -224,9 +224,9 @@ class WaitCardState(State):
             self.server.send(self.room.user_list[i].socket_id, specialopedata)
 
         if specialoperationflag:
-            self.room.replies = []
             self.room.state = WaitSpecailReplyState(self.room, self.server)
         else:
+            self.room.nextPlayer()
             card = self.room.drawCard()
             carddata["room"] = str(self.room.room_id)
             carddata["player"] = reply["room_id"]
@@ -252,8 +252,8 @@ class WaitSpecailReplyState(State):
     def ChangeToNextState(self, reply):
         self.room.replies.append(reply)
         if len(self.room.replies) == 4:
-            highestchoice = 0               # 需要一个方法根据操作的优先级和编号来决定操作由谁做
             for r in self.room.replies:
+
                 pass
 
 class WaitZimoState(State):

@@ -1,6 +1,5 @@
-from Logic import *
 from GameStates import *
-import numpy as np
+from HuCalculator import *
 
 class Room:
     def __init__(self, room_id, server):
@@ -43,7 +42,7 @@ class Room:
         self.game = Game(colleges[0], colleges[1])
         return colleges
 
-        def setCalculator(self, player_id, college_id, skill_id):
+    def setCalculator(self, player_id, college_id, skill_id):
         player = self.game.id_to_player[player_id]
         huCalculator = HuCalculator(None)
         huCalculator.setPlayer(player)
@@ -126,7 +125,7 @@ class Room:
     def drawCard(self):
         card = self.game.popCard()
         self.game.current_player.recieveCard(card)
-        return card
+        return card.card_id
 
     def playCard(self, card_id):
         card = self.game.id_to_card[card_id]
