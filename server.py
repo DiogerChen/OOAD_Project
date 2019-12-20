@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from Room import *
 import socket
 import threading

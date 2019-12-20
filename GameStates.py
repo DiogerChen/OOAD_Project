@@ -1,8 +1,9 @@
+# coding=utf-8
+
 from Room import *
 from User import *
 import logging
 import time
-
 
 roominfoupdata = {"type": "roominfo", "room": None, "room_id": None, "name": "", "ready": ""}
 initcarddata = {"type": "initcard", "room": None, "room_id": None, "content": ""}
@@ -14,8 +15,8 @@ playdata = {"type": "play", "room": None, "room_id": None, "player": None, "card
 specialopedata = {"type": "specialope", "room": None, "room_id": None, "chi1": None,
                   "chi2": None, "chi3": None, "peng": None, "gang": None, "hu": "0"}
 hurequest = {"type": "specialope", "socket_id": 0, "room": None, "room_id": None,
-                                 "chi1": None, "chi2": None, "chi3": None,
-                                 "peng": None, "gang": None, "hu": "1"}
+             "chi1": None, "chi2": None, "chi3": None,
+             "peng": None, "gang": None, "hu": "1"}
 
 
 def sendmsgtogether(userlist, server, data):
@@ -55,7 +56,6 @@ class State:
         logging.debug(str(self))
 
     def ChangeToNextState(self, reply):
-        # 需要一个服务器每次收到消息都执行ChangeToNextState()的方法
         pass
 
 
@@ -253,6 +253,8 @@ class WaitCardState(State):
         else:
             card = self.room.drawCard()
             sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
+
+            # Need to ensure the Hu check Code
             for i in range(1, 5):
                 if self.room.checkHu(i):
                     hurequest["room"] = str(self.room.room_id)
@@ -276,6 +278,7 @@ class WaitSpecailReplyState(State):
         if len(self.room.replies) == 4:
             maxchoiceplayer = 0
             maxchoice = 0
+            # 操作优先级：胡>杠>碰>吃，同时出现多个玩家可以操作的时候，按这种顺序决定执行谁的操作
             for r in self.room.replies:
                 if int(r["content"]) > maxchoice:
                     maxchoice = int(r["content"])
@@ -309,6 +312,7 @@ class WaitSpecailReplyState(State):
             elif maxchoice == 6:
                 self.room.Hu(maxchoiceplayer)
                 # send Hu description
+                # if delete player?
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, maxchoiceplayer)
             self.room.state = WaitCardState(self.room, self.server)
 
@@ -322,18 +326,13 @@ class WaitZimoState(State):
 
     def ChangeToNextState(self, reply):
         if reply["hu"] is None:
-            card = self.room.drawCard()
-            sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
             self.room.state = WaitCardState(self.room, self.server)
         else:
             self.room.Hu(reply["room_id"])
             # delete player
+            # 是否需要nextPlayer()?不需要的话可以直接结算然后结束游戏
             card = self.room.drawCard()
-            carddata["room"] = str(self.room.room_id)
-            carddata["player"] = reply["room_id"]
-            carddata["content"] = str(card)
-            sendmsgtogether(self.room.user_list, self.server, carddata)
-
+            sendDrawCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"], card)
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
             self.room.state = WaitCardState(self.room, self.server)
