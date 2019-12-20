@@ -266,7 +266,13 @@ class Room:
             player = self.game.id_to_player[i]
             if player in self.game.remaining_player_list:
                 if player == last_player:
-                    temp = None
+                    temp.append(False)
+                    temp.append([None, None, None])
+                    temp.append(False)
+                    temp.append([None, None, None])
+                    temp.append(False)
+                    temp.append([None, None, None, None])
+                    temp.append(False)
                 elif player == self.game.current_player:
                     chiable, choices = self.checkChi(i, card_id)
                     temp.append(chiable)
@@ -293,6 +299,12 @@ class Room:
                     temp.append(self.checkHu(i))
                     player.hand.remove(card)
             else:
-                temp = None
+                temp.append(False)
+                temp.append([None, None, None])
+                temp.append(False)
+                temp.append([None, None, None])
+                temp.append(False)
+                temp.append([None, None, None, None])
+                temp.append(False)
             result[i - 1] = temp
         return result
