@@ -3,7 +3,7 @@
 from Room import *
 from User import *
 import logging
-import time
+# import time
 
 roominfoupdata = {"type": "roominfo", "room": None, "room_id": None, "name": "", "ready": ""}
 initcarddata = {"type": "initcard", "room": None, "room_id": None, "content": ""}
@@ -255,15 +255,13 @@ class WaitCardState(State):
             sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
 
             # Need to ensure the Hu check Code
-            for i in range(1, 5):
-                if self.room.checkHu(i):
-                    hurequest["room"] = str(self.room.room_id)
-                    hurequest["room_id"] = str(self.room.getCurrentPlayer())
-                    self.server.send(self.room.user_list[i].socket_id, hurequest)
-                    self.room.state = WaitZimoState(self.room, self.server)
-                else:
-                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
-                    self.room.state = WaitCardState(self.room, self.server)
+            if self.room.checkHu(self.room.getCurrentPlayer()):  # 发现可以自摸
+                hurequest["room"] = str(self.room.room_id)
+                hurequest["room_id"] = str(self.room.getCurrentPlayer())
+                self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
+            else:
+                sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
+                self.room.state = WaitCardState(self.room, self.server)
 
 
 class WaitSpecailReplyState(State):
@@ -287,15 +285,14 @@ class WaitSpecailReplyState(State):
             if maxchoice == 0:
                 card = self.room.drawCard()
                 sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
-                for i in range(1, 5):
-                    if self.room.checkHu(i):
-                        hurequest["room"] = str(self.room.room_id)
-                        hurequest["room_id"] = str(self.room.getCurrentPlayer())
-                        self.server.send(self.room.user_list[i].socket_id, hurequest)
-                        self.room.state = WaitZimoState(self.room, self.server)
-                    else:
-                        sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
-                        self.room.state = WaitCardState(self.room, self.server)
+                if self.room.checkHu(self.room.getCurrentPlayer()):     # 发现可以自摸
+                    hurequest["room"] = str(self.room.room_id)
+                    hurequest["room_id"] = str(self.room.getCurrentPlayer())
+                    self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
+                    self.room.state = WaitZimoState(self.room, self.server)
+                else:
+                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
+                    self.room.state = WaitCardState(self.room, self.server)
                 return
             elif maxchoice == 1:
                 self.room.Chi(maxchoiceplayer, self.room.lastcardid, 0)
