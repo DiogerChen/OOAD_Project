@@ -251,26 +251,47 @@ class Room:
         return player.hu_discription
 
     def checkAll(self, card_id):
-        # result[0]中依次是player1的：chiable, choices, penable, first_two_same, gangable, first_three_same, huable
-        # 如果该player2已经胡了，则result[1]为None
+        # result[0]中依次是player1的：chiable,choices,penable,first_two_same,gangable,first_three_same,huable
+        # 如果该player2已经胡了或者是刚刚打出这张牌的人，则result[1]为None
         result = [[], [], [], []]
         card = self.game.id_to_card[card_id]
+        index = self.game.remaining_player_list.index(self.game.current_player)
+        if index == 0:
+            index = len(self.game.remaining_player_list) - 1
+        else:
+            index -= 1
+        last_player = self.game.remaining_player_list[index]
         for i in range(1, 5):
             temp = []
             player = self.game.id_to_player[i]
             if player in self.game.remaining_player_list:
-                chiable, choices = self.checkChi(i, card_id)
-                temp.append(chiable)
-                temp.append(choices)
-                penable, first_two_same = self.checkPeng(i, card_id)
-                temp.append(penable)
-                temp.append(first_two_same)
-                gangable, first_three_same = self.checkGang(i, card_id)
-                temp.append(gangable)
-                temp.append(first_three_same)
-                player.recieveCard(card)
-                temp.append(self.checkHu(i))
-                player.hand.remove(card)
+                if player == last_player:
+                    temp = None
+                elif player == self.game.current_player:
+                    chiable, choices = self.checkChi(i, card_id)
+                    temp.append(chiable)
+                    temp.append(choices)
+                    penable, first_two_same = self.checkPeng(i, card_id)
+                    temp.append(penable)
+                    temp.append(first_two_same)
+                    gangable, first_three_same = self.checkGang(i, card_id)
+                    temp.append(gangable)
+                    temp.append(first_three_same)
+                    player.recieveCard(card)
+                    temp.append(self.checkHu(i))
+                    player.hand.remove(card)
+                else:
+                    temp.append(False)
+                    temp.append([None, None, None])
+                    penable, first_two_same = self.checkPeng(i, card_id)
+                    temp.append(penable)
+                    temp.append(first_two_same)
+                    gangable, first_three_same = self.checkGang(i, card_id)
+                    temp.append(gangable)
+                    temp.append(first_three_same)
+                    player.recieveCard(card)
+                    temp.append(self.checkHu(i))
+                    player.hand.remove(card)
             else:
                 temp = None
             result[i - 1] = temp
