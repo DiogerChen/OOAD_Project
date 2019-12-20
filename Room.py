@@ -71,6 +71,8 @@ class Room:
         elif skill_id == 5:
             huCalculator = huCalculator.calculator
             huCalculator = StableCalculator(huCalculator)
+        elif skill_id == 6:
+            huCalculator = ZhiXinCalculator(huCalculator)
         player.huCalculator = huCalculator
 
     def getCurrentPlayer(self):
