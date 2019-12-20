@@ -194,7 +194,7 @@ class WaitPairChoiceState(State):
                     card = self.room.drawCard()
                     sendDrawCardData(self.room.user_list, self.server, self.room.room_id, 1, card)
 
-                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
+                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                     self.room.state = WaitCardState(self.room, self.server)
 
 
@@ -247,7 +247,8 @@ class WaitCardState(State):
             if result[i][6] == 1:
                 specialoperationflag = True
                 specialopedata["hu"] = "1"
-            self.server.send(int(self.room.user_list[i].socket_id), specialopedata)
+            if specialoperationflag:
+                self.server.send(int(self.room.user_list[i].socket_id), specialopedata)
         if specialoperationflag:
             self.room.state = WaitSpecailReplyState(self.room, self.server)
         else:
@@ -260,7 +261,7 @@ class WaitCardState(State):
                 hurequest["room_id"] = str(self.room.getCurrentPlayer())
                 self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
             else:
-                sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
+                sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                 self.room.state = WaitCardState(self.room, self.server)
 
 
@@ -291,7 +292,7 @@ class WaitSpecailReplyState(State):
                     self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
                     self.room.state = WaitZimoState(self.room, self.server)
                 else:
-                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
+                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                     self.room.state = WaitCardState(self.room, self.server)
                 return
             elif maxchoice == 1:
@@ -323,13 +324,13 @@ class WaitZimoState(State):
 
     def ChangeToNextState(self, reply):
         if reply["hu"] is None:
-            sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
+            sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
             self.room.state = WaitCardState(self.room, self.server)
         else:
             self.room.Hu(reply["room_id"])
             # delete player
             # 是否需要nextPlayer()?不需要的话可以直接结算然后结束游戏
             card = self.room.drawCard()
-            sendDrawCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"], card)
-            sendAskCardData(self.room.user_list, self.server, self.room.room_id, reply["room_id"])
+            sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
+            sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
             self.room.state = WaitCardState(self.room, self.server)
