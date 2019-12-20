@@ -66,7 +66,7 @@ class server:
         data = json.dumps(data)
         print("Server send: " + str(data))
         logging.debug("Server send: " + str(data))
-        self.client[who-1].send(data.encode('utf-8'))
+        self.client[int(who)-1].send(data.encode('utf-8'))
 
 
 if __name__ == "__main__":

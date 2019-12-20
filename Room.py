@@ -12,6 +12,7 @@ class Room:
         self.supervisorchoice = {}
         self.orders = []
         self.selectround = 1
+        self.lastcardid = 0
 
     def ChangeToNextState(self, reply):
         self.state.ChangeToNextState(reply)
@@ -131,6 +132,7 @@ class Room:
         return card.card_id
 
     def playCard(self, card_id):
+        self.lastcardid = card_id
         card = self.game.id_to_card[card_id]
         self.game.current_player.playCard(card)
         self.nextPlayer()
