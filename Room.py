@@ -252,7 +252,6 @@ class Room:
 
     def checkAll(self, card_id):
         # result[0]中依次是player1的：chiable,choices,penable,first_two_same,gangable,first_three_same,huable
-        # 如果该player2已经胡了或者是刚刚打出这张牌的人，则result[1]为None
         result = [[], [], [], []]
         card = self.game.id_to_card[card_id]
         index = self.game.remaining_player_list.index(self.game.current_player)
