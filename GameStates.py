@@ -214,14 +214,13 @@ class WaitCardState(State):
         result = self.room.checkAll(int(reply["content"]))
         specialoperationflag = False
         specialopedata["room"] = str(self.room.room_id)
-        for i in range(1, 4):
+        for i in range(0, 4):
             if result[i][0] == 0:
                 specialopedata["chi1"] = None
                 specialopedata["chi2"] = None
                 specialopedata["chi3"] = None
             else:
                 specialoperationflag = True
-
                 if result[i][1][0] is None:
                     specialopedata["chi1"] = None
                 else:
