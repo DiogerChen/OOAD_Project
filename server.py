@@ -8,6 +8,7 @@ import random
 import datetime
 import logging
 import os
+import time
 
 
 class server:
@@ -69,6 +70,7 @@ class server:
         print("Server send: " + str(data))
         logging.debug("Server send: " + str(data))
         self.client[int(who)-1].send(data.encode('utf-8'))
+        time.sleep(0.05)    # Unity是逐帧更新，发包间隔过短很有可能会让前端收不到消息
 
 
 if __name__ == "__main__":

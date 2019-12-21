@@ -3,7 +3,6 @@
 from Room import *
 from User import *
 import logging
-# import time
 
 roominfoupdata = {"type": "roominfo", "room": None, "room_id": None, "name": "", "ready": ""}
 initcarddata = {"type": "initcard", "room": None, "room_id": None, "content": ""}
@@ -12,8 +11,6 @@ pairdata = {"type": "pair", "room": None, "room_id": None, "content": ""}
 askchoicedata = {"type": "askchoice", "room": None, "room_id": None, "content": None}
 askcarddata = {"type": "askcard", "room": None, "room_id": None, "content": None}
 playdata = {"type": "play", "room": None, "room_id": None, "player": None, "card": None}
-specialopedata = {"type": "specialope", "room": None, "room_id": None, "chi1": None,
-                  "chi2": None, "chi3": None, "peng": None, "gang": None, "hu": "0"}
 hurequest = {"type": "specialope", "socket_id": 0, "room": None, "room_id": None,
              "chi1": None, "chi2": None, "chi3": None,
              "peng": None, "gang": None, "hu": "1"}
@@ -204,6 +201,7 @@ class WaitCardState(State):
 
     def __init__(self, room, server):
         super().__init__(room, server)
+        self.room.specialopelist = []
 
     def ChangeToNextState(self, reply):
         # Tell everyone what play
@@ -213,8 +211,9 @@ class WaitCardState(State):
         # Check if Chi Peng Gang Hu
         result = self.room.checkAll(int(reply["content"]))
         specialoperationflag = False
-        specialopedata["room"] = str(self.room.room_id)
         for i in range(0, 4):
+            specialopedata = {"type": "specialope", "room": str(self.room.room_id), "room_id": str(i + 1), "chi1": None,
+                              "chi2": None, "chi3": None, "peng": None, "gang": None, "hu": "0"}
             if result[i][0] == 0:
                 specialopedata["chi1"] = None
                 specialopedata["chi2"] = None
@@ -246,19 +245,24 @@ class WaitCardState(State):
             if result[i][6] == 1:
                 specialoperationflag = True
                 specialopedata["hu"] = "1"
-            if specialoperationflag:
-                self.server.send(int(self.room.user_list[i].socket_id), specialopedata)
+
+            self.room.specialopelist.append(specialopedata)
+
         if specialoperationflag:
+            for i in range(0, 4):
+                playerid = int(self.room.specialopelist[i]["room_id"])
+                if self.room.user_list[playerid] is not None:
+                    self.server.send(int(self.room.user_list[playerid].socket_id), self.room.specialopelist[i])
             self.room.state = WaitSpecailReplyState(self.room, self.server)
         else:
             card = self.room.drawCard()
             sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
-
             # Need to ensure the Hu check Code
             if self.room.checkHu(self.room.getCurrentPlayer()):  # 发现可以自摸
                 hurequest["room"] = str(self.room.room_id)
                 hurequest["room_id"] = str(self.room.getCurrentPlayer())
                 self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
+                self.room.state = WaitZimoState(self.room, self.server)
             else:
                 sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                 self.room.state = WaitCardState(self.room, self.server)
@@ -282,6 +286,7 @@ class WaitSpecailReplyState(State):
                     maxchoice = int(r["content"])
                     maxchoiceplayer = int(r["room_id"])
                 # 暂不考虑两人同时胡的时候的比较判断
+            print("maxchoiceplayer: "+ str(maxchoiceplayer) + " maxchoice: "+ str(maxchoice))
             if maxchoice == 0:
                 card = self.room.drawCard()
                 sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)

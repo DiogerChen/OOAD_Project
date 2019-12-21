@@ -13,6 +13,7 @@ class Room:
         self.orders = []
         self.selectround = 1
         self.lastcardid = 0
+        self.specialopelist = []
 
     def ChangeToNextState(self, reply):
         self.state.ChangeToNextState(reply)
