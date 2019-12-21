@@ -237,11 +237,11 @@ class WaitCardState(State):
                                                                result[i][1][2][2])
             if result[i][2] == 1:
                 specialoperationflag = True
-                specialopedata["peng"] = '{} {} {}'.format(result[i][3][0], result[i][3][1], result[i][3][2])
+                specialopedata["peng"] = '{} {} {}'.format(result[i][3][0], result[i][3][1], self.room.lastcardid)
             if result[i][4] == 1:
                 specialoperationflag = True
                 specialopedata["gang"] = '{} {} {} {}'.format(result[i][5][0], result[i][5][1], result[i][5][2],
-                                                              result[i][5][3])
+                                                              self.room.lastcardid)
             if result[i][6] == 1:
                 specialoperationflag = True
                 specialopedata["hu"] = "1"

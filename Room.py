@@ -269,9 +269,9 @@ class Room:
                     temp.append(False)
                     temp.append([None, None, None])
                     temp.append(False)
-                    temp.append([None, None, None])
+                    temp.append([None, None])
                     temp.append(False)
-                    temp.append([None, None, None, None])
+                    temp.append([None, None, None])
                     temp.append(False)
                 elif player == self.game.current_player:
                     chiable, choices = self.checkChi(i, card_id)
@@ -302,9 +302,9 @@ class Room:
                 temp.append(False)
                 temp.append([None, None, None])
                 temp.append(False)
-                temp.append([None, None, None])
+                temp.append([None, None])
                 temp.append(False)
-                temp.append([None, None, None, None])
+                temp.append([None, None, None])
                 temp.append(False)
             result[i - 1] = temp
         return result
