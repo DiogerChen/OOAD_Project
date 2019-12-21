@@ -1,5 +1,5 @@
 import random
-
+import numpy as np
 # type_hash = {'wan': 0, 'tiao': 1, 'bin': 2, 'zhiren':3, 'shuren':4, 'zhicheng':5, 'shude':6, 'zhixin':7, 'shuli':8, 'bai':9, 'fa':10, 'zhong':11}
 
 

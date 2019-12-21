@@ -14,6 +14,7 @@ class Room:
         self.selectround = 1
         self.lastcardid = 0
         self.specialopelist = []
+        self.cheackallresult = []
 
     def ChangeToNextState(self, reply):
         self.state.ChangeToNextState(reply)

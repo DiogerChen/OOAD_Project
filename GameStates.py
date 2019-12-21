@@ -14,7 +14,7 @@ playdata = {"type": "play", "room": None, "room_id": None, "player": None, "card
 hurequest = {"type": "specialope", "socket_id": 0, "room": None, "room_id": None,
              "chi1": None, "chi2": None, "chi3": None,
              "peng": None, "gang": None, "hu": "1"}
-
+cpgdata = {"type":"cpg", "room": None, "room_id": None, "player": None, "card": None}
 
 def sendmsgtogether(userlist, server, data):
     for i in userlist:
@@ -105,8 +105,8 @@ class WaitReadyState(State):
                 for c in self.room.getHand(i):
                     initcarddata["content"] += str(c) + ' '
             initcarddata["content"] = initcarddata["content"][:-1]
-            sendmsgtogether(self.room.user_list, self.server, initcarddata)
             self.room.state = WaitSupervisorState(self.room, self.server)
+            sendmsgtogether(self.room.user_list, self.server, initcarddata)
 
 
 class WaitSupervisorState(State):
@@ -129,9 +129,9 @@ class WaitSupervisorState(State):
             for c in self.room.paircards:
                 pairdata["content"] += '{} {} '.format(c[0], c[1])
             pairdata["content"] = pairdata["content"][:-1]
-            sendmsgtogether(self.room.user_list, self.server, pairdata)
 
             self.room.state = WaitScoreState(self.room, self.server)
+            sendmsgtogether(self.room.user_list, self.server, pairdata)
 
 
 class WaitScoreState(State):
@@ -184,15 +184,16 @@ class WaitPairChoiceState(State):
                     for c in self.room.paircards:
                         pairdata["content"] += '{} {} '.format(c[0], c[1])
                     pairdata["content"] = pairdata["content"][:-1]
-                    sendmsgtogether(self.room.user_list, self.server, pairdata)
 
                     self.room.state = WaitScoreState(self.room, self.server)
+                    sendmsgtogether(self.room.user_list, self.server, pairdata)
+
                 else:
                     card = self.room.drawCard()
                     sendDrawCardData(self.room.user_list, self.server, self.room.room_id, 1, card)
 
-                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                     self.room.state = WaitCardState(self.room, self.server)
+                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
 
 
 class WaitCardState(State):
@@ -202,70 +203,73 @@ class WaitCardState(State):
     def __init__(self, room, server):
         super().__init__(room, server)
         self.room.specialopelist = []
+        self.room.cheackallresult = []
 
     def ChangeToNextState(self, reply):
         # Tell everyone what play
-        self.room.playCard(int(reply["content"]))
-        sendPlayData(self.room.user_list, self.server, reply["room"], reply["room_id"], reply["content"])
+        if reply["type"] == "playcard":
+            self.room.playCard(int(reply["content"]))
+            sendPlayData(self.room.user_list, self.server, reply["room"], reply["room_id"], reply["content"])
 
-        # Check if Chi Peng Gang Hu
-        result = self.room.checkAll(int(reply["content"]))
-        specialoperationflag = False
-        for i in range(0, 4):
-            specialopedata = {"type": "specialope", "room": str(self.room.room_id), "room_id": str(i + 1), "chi1": None,
-                              "chi2": None, "chi3": None, "peng": None, "gang": None, "hu": "0"}
-            if result[i][0] == 0:
-                specialopedata["chi1"] = None
-                specialopedata["chi2"] = None
-                specialopedata["chi3"] = None
-            else:
-                specialoperationflag = True
-                if result[i][1][0] is None:
+            # Check if Chi Peng Gang Hu
+            self.room.cheackallresult = self.room.checkAll(int(reply["content"]))
+            specialoperationflag = False
+            for i in range(0, 4):
+                specialopedata = {"type": "specialope", "room": str(self.room.room_id), "room_id": str(i + 1), "chi1": None,
+                                  "chi2": None, "chi3": None, "peng": None, "gang": None, "hu": "0"}
+                if self.room.cheackallresult[i][0] == 0:
                     specialopedata["chi1"] = None
-                else:
-                    specialopedata["chi1"] = '{} {} {}'.format(result[i][1][0][0], result[i][1][0][1],
-                                                               result[i][1][0][2])
-                if result[i][1][1] is None:
                     specialopedata["chi2"] = None
-                else:
-                    specialopedata["chi2"] = '{} {} {}'.format(result[i][1][1][0], result[i][1][1][1],
-                                                               result[i][1][1][2])
-                if result[i][1][2] is None:
                     specialopedata["chi3"] = None
                 else:
-                    specialopedata["chi3"] = '{} {} {}'.format(result[i][1][2][0], result[i][1][2][1],
-                                                               result[i][1][2][2])
-            if result[i][2] == 1:
-                specialoperationflag = True
-                specialopedata["peng"] = '{} {} {}'.format(result[i][3][0], result[i][3][1], self.room.lastcardid)
-            if result[i][4] == 1:
-                specialoperationflag = True
-                specialopedata["gang"] = '{} {} {} {}'.format(result[i][5][0], result[i][5][1], result[i][5][2],
-                                                              self.room.lastcardid)
-            if result[i][6] == 1:
-                specialoperationflag = True
-                specialopedata["hu"] = "1"
+                    specialoperationflag = True
+                    if self.room.cheackallresult[i][1][0] is None:
+                        specialopedata["chi1"] = None
+                    else:
+                        specialopedata["chi1"] = '{} {} {}'.format(self.room.cheackallresult[i][1][0][0], self.room.cheackallresult[i][1][0][1],
+                                                                   self.room.cheackallresult[i][1][0][2])
+                    if self.room.cheackallresult[i][1][1] is None:
+                        specialopedata["chi2"] = None
+                    else:
+                        specialopedata["chi2"] = '{} {} {}'.format(self.room.cheackallresult[i][1][1][0], self.room.cheackallresult[i][1][1][1],
+                                                                   self.room.cheackallresult[i][1][1][2])
+                    if self.room.cheackallresult[i][1][2] is None:
+                        specialopedata["chi3"] = None
+                    else:
+                        specialopedata["chi3"] = '{} {} {}'.format(self.room.cheackallresult[i][1][2][0], self.room.cheackallresult[i][1][2][1],
+                                                                   self.room.cheackallresult[i][1][2][2])
+                if self.room.cheackallresult[i][2] == 1:
+                    specialoperationflag = True
+                    specialopedata["peng"] = '{} {} {}'.format(self.room.cheackallresult[i][3][0], self.room.cheackallresult[i][3][1], self.room.lastcardid)
+                if self.room.cheackallresult[i][4] == 1:
+                    specialoperationflag = True
+                    specialopedata["gang"] = '{} {} {} {}'.format(self.room.cheackallresult[i][5][0], self.room.cheackallresult[i][5][1], self.room.cheackallresult[i][5][2],
+                                                                  self.room.lastcardid)
+                if self.room.cheackallresult[i][6] == 1:
+                    specialoperationflag = True
+                    specialopedata["hu"] = "1"
 
-            self.room.specialopelist.append(specialopedata)
+                self.room.specialopelist.append(specialopedata)
 
-        if specialoperationflag:
-            for i in range(0, 4):
-                playerid = int(self.room.specialopelist[i]["room_id"])
-                if self.room.user_list[playerid] is not None:
-                    self.server.send(int(self.room.user_list[playerid].socket_id), self.room.specialopelist[i])
-            self.room.state = WaitSpecailReplyState(self.room, self.server)
-        else:
-            card = self.room.drawCard()
-            sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
-            # Need to ensure the Hu check Code
-            if self.room.checkHu(self.room.getCurrentPlayer()):  # 发现可以自摸
-                hurequest["room"] = str(self.room.room_id)
-                hurequest["room_id"] = str(self.room.getCurrentPlayer())
-                self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
-                self.room.state = WaitZimoState(self.room, self.server)
+            if specialoperationflag:
+                self.room.state = WaitSpecailReplyState(self.room, self.server)
+                for i in range(0, 4):
+                    playerid = int(self.room.specialopelist[i]["room_id"])
+                    if self.room.user_list[playerid-1] is not None:
+                        self.server.send(int(self.room.user_list[playerid-1].socket_id), self.room.specialopelist[i])
             else:
-                sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
-                self.room.state = WaitCardState(self.room, self.server)
+                card = self.room.drawCard()
+                sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
+                # Need to ensure the Hu check Code
+                if self.room.checkHu(self.room.getCurrentPlayer()):  # 发现可以自摸
+                    self.room.state = WaitZimoState(self.room, self.server)
+                    hurequest["room"] = str(self.room.room_id)
+                    hurequest["room_id"] = str(self.room.getCurrentPlayer())
+                    self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
+                else:
+                    self.room.state = WaitCardState(self.room, self.server)
+                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
+
 
 
 class WaitSpecailReplyState(State):
@@ -291,32 +295,60 @@ class WaitSpecailReplyState(State):
                 card = self.room.drawCard()
                 sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
                 if self.room.checkHu(self.room.getCurrentPlayer()):     # 发现可以自摸
+                    self.room.state = WaitZimoState(self.room, self.server)
                     hurequest["room"] = str(self.room.room_id)
                     hurequest["room_id"] = str(self.room.getCurrentPlayer())
                     self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
-                    self.room.state = WaitZimoState(self.room, self.server)
                 else:
-                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                     self.room.state = WaitCardState(self.room, self.server)
+                    sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                 return
             elif maxchoice == 1:
                 self.room.Chi(maxchoiceplayer, self.room.lastcardid, 0)
+                chicards = self.room.cheackallresult[maxchoiceplayer-1][1][0]
+                cpgdata["card"] = "{} {} {}".format(chicards[0], chicards[1], chicards[2])
+                cpgdata["room"] = str(self.room.room_id)
+                cpgdata["player"] = str(maxchoiceplayer)
+                sendmsgtogether(self.room.user_list, self.server, cpgdata)
             elif maxchoice == 2:
                 self.room.Chi(maxchoiceplayer, self.room.lastcardid, 1)
+                chicards = self.room.cheackallresult[maxchoiceplayer-1][1][1]
+                cpgdata["card"] = "{} {} {}".format(chicards[0], chicards[1], chicards[2])
+                cpgdata["room"] = str(self.room.room_id)
+                cpgdata["player"] = str(maxchoiceplayer)
+                sendmsgtogether(self.room.user_list, self.server, cpgdata)
             elif maxchoice == 3:
                 self.room.Chi(maxchoiceplayer, self.room.lastcardid, 2)
+                chicards = self.room.cheackallresult[maxchoiceplayer-1][1][2]
+                cpgdata["card"] = "{} {} {}".format(chicards[0], chicards[1], chicards[2])
+                cpgdata["room"] = str(self.room.room_id)
+                cpgdata["player"] = str(maxchoiceplayer)
+                sendmsgtogether(self.room.user_list, self.server, cpgdata)
             elif maxchoice == 4:
                 self.room.Peng(maxchoiceplayer, self.room.lastcardid)
+                pengcards = self.room.cheackallresult[maxchoiceplayer-1][3]
+                cpgdata["card"] = "{} {} {}".format(pengcards[0], pengcards[1], self.room.lastcardid)
+                cpgdata["room"] = str(self.room.room_id)
+                cpgdata["player"] = str(maxchoiceplayer)
+                sendmsgtogether(self.room.user_list, self.server, cpgdata)
             elif maxchoice == 5:
                 self.room.Gang(maxchoiceplayer, self.room.lastcardid)
+                gangcards = self.room.cheackallresult[maxchoiceplayer-1][5]
+                cpgdata["card"] = "{} {} {} {}".format(gangcards[0], gangcards[1], gangcards[2], self.room.lastcardid)
+                cpgdata["room"] = str(self.room.room_id)
+                cpgdata["player"] = str(maxchoiceplayer)
+                sendmsgtogether(self.room.user_list, self.server, cpgdata)
+
                 card = self.room.drawCard()
                 sendDrawCardData(self.room.user_list, self.server, self.room.room_id, maxchoiceplayer, card)
             elif maxchoice == 6:
                 self.room.Hu(maxchoiceplayer)
                 # send Hu description
                 # if delete player?
-            sendAskCardData(self.room.user_list, self.server, self.room.room_id, maxchoiceplayer)
+
+
             self.room.state = WaitCardState(self.room, self.server)
+            sendAskCardData(self.room.user_list, self.server, self.room.room_id, maxchoiceplayer)
 
 
 class WaitZimoState(State):
@@ -328,13 +360,14 @@ class WaitZimoState(State):
 
     def ChangeToNextState(self, reply):
         if reply["hu"] is None:
-            sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
             self.room.state = WaitCardState(self.room, self.server)
+            sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
         else:
+            self.room.state = WaitCardState(self.room, self.server)
             self.room.Hu(reply["room_id"])
             # delete player
             # 是否需要nextPlayer()?不需要的话可以直接结算然后结束游戏
             card = self.room.drawCard()
             sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
-            self.room.state = WaitCardState(self.room, self.server)
+
