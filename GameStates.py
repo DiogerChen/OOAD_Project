@@ -208,9 +208,13 @@ class WaitCardState(State):
     def ChangeToNextState(self, reply):
         # Tell everyone what play
         if reply["type"] == "playcard":
-            self.room.playCard(int(reply["content"]))
-            sendPlayData(self.room.user_list, self.server, reply["room"], reply["room_id"], reply["content"])
-
+            if reply["content"] != -1:
+                self.room.playCard(int(reply["content"]))
+                sendPlayData(self.room.user_list, self.server, reply["room"], reply["room_id"], reply["content"])
+            else:
+                randomcard = self.room.playRandomCard()
+                self.room.playCard(randomcard)
+                sendPlayData(self.room.user_list, self.server, reply["room"], reply["room_id"], str(randomcard))
             # Check if Chi Peng Gang Hu
             self.room.cheackallresult = self.room.checkAll(int(reply["content"]))
             specialoperationflag = False
