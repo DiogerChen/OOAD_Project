@@ -211,12 +211,12 @@ class WaitCardState(State):
             if int(reply["content"]) != -1:
                 self.room.playCard(int(reply["content"]))
                 sendPlayData(self.room.user_list, self.server, reply["room"], reply["room_id"], reply["content"])
+                self.room.cheackallresult = self.room.checkAll(int(reply["content"]))
             else:
                 randomcard = self.room.playRandomCard()
-                self.room.playCard(randomcard)
                 sendPlayData(self.room.user_list, self.server, reply["room"], reply["room_id"], str(randomcard))
+                self.room.cheackallresult = self.room.checkAll(randomcard)
             # Check if Chi Peng Gang Hu
-            self.room.cheackallresult = self.room.checkAll(int(reply["content"]))
             specialoperationflag = False
             for i in range(0, 4):
                 specialopedata = {"type": "specialope", "room": str(self.room.room_id), "room_id": str(i + 1), "chi1": None,
@@ -374,4 +374,5 @@ class WaitZimoState(State):
             card = self.room.drawCard()
             sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
+
 
