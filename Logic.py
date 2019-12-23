@@ -245,7 +245,7 @@ class Player:
         return gangable, first_three_same
 
     def Gang(self, discard):
-        gangable, first_three_same = self.checkPeng(discard)
+        gangable, first_three_same = self.checkGang(discard)
         if gangable:
             self.hand.remove(first_three_same[0])
             self.expose_area.append(first_three_same[0])
