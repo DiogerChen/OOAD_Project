@@ -189,17 +189,14 @@ class Player:
                 self.hand.remove(choices[0][1])
                 self.expose_area.append(choices[0][1])
                 self.expose_area.append(discard)
-                self.hand.remove(discard)
             elif choice_num == 1:
                 self.hand.remove(choices[1][0])
                 self.expose_area.append(choices[1][0])
                 self.expose_area.append(discard)
-                self.hand.remove(discard)
                 self.hand.remove(choices[1][2])
                 self.expose_area.append(choices[1][2])
             elif choice_num == 2:
                 self.expose_area.append(discard)
-                self.hand.remove(discard)
                 self.hand.remove(choices[2][1])
                 self.expose_area.append(choices[2][1])
                 self.hand.remove(choices[2][2])
@@ -230,7 +227,6 @@ class Player:
             self.hand.remove(first_two_same[1])
             self.expose_area.append(first_two_same[1])
             self.expose_area.append(discard)
-            self.hand.remove(discard)
             return True
         else:
             return False
@@ -258,7 +254,6 @@ class Player:
             self.hand.remove(first_three_same[2])
             self.expose_area.append(first_three_same[2])
             self.expose_area.append(discard)
-            self.hand.remove(discard)
             return True
         else:
             return False
