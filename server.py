@@ -12,7 +12,7 @@ import time
 
 
 class server:
-    serverName = '10.21.41.131'
+    serverName = '10.21.47.11'
     serverPort = 5555
     client = []
     rooms = {}

@@ -15,6 +15,8 @@ hurequest = {"type": "specialope", "socket_id": 0, "room": None, "room_id": None
              "chi1": None, "chi2": None, "chi3": None,
              "peng": None, "gang": None, "hu": "1"}
 cpgdata = {"type":"cpg", "room": None, "room_id": None, "player": None, "card": None}
+hudata = {"type":"hu", "room": None, "room_id":None, "player":None,
+          "score":None, "content": None,"card": None}
 
 def sendmsgtogether(userlist, server, data):
     for i in userlist:
@@ -122,6 +124,8 @@ class WaitSupervisorState(State):
         if len(self.room.replies) == 4:
             for c in self.room.replies:
                 self.room.supervisorchoice[c["room_id"]] = int(c["content"])
+                self.room.setCalculator(int(c["room_id"]), int(c["content"]), int(c["content"]))
+
             # get pairs of cards then go to next state
             self.room.paircards = self.room.generateFourPairs()
             pairdata["room"] = str(self.room.room_id)
@@ -269,11 +273,16 @@ class WaitCardState(State):
                     self.room.state = WaitZimoState(self.room, self.server)
                     hurequest["room"] = str(self.room.room_id)
                     hurequest["room_id"] = str(self.room.getCurrentPlayer())
-                    self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
+                    self.server.send(self.room.user_list[self.room.getCurrentPlayer()-1].socket_id, hurequest)
+                    for i in self.room.user_list:
+                        if i is not None and i != self.room.getCurrentPlayer()-1:
+                            specialopedata = {"type": "specialope", "room": str(self.room.room_id),
+                                              "room_id": str(i + 1), "chi1": None,
+                                              "chi2": None, "chi3": None, "peng": None, "gang": None, "hu": "0"}
+                            self.server.send(int(i.socket_id), specialopedata)
                 else:
                     self.room.state = WaitCardState(self.room, self.server)
                     sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
-
 
 
 class WaitSpecailReplyState(State):
@@ -347,10 +356,19 @@ class WaitSpecailReplyState(State):
                 sendDrawCardData(self.room.user_list, self.server, self.room.room_id, maxchoiceplayer, card)
             elif maxchoice == 6:
                 self.room.Hu(maxchoiceplayer)
-                # send Hu description
-                # if delete player?
-
-
+                score = self.room.getScore(maxchoiceplayer)
+                description = self.room.getHuDiscription(maxchoiceplayer)
+                cards = self.room.getAllCard(maxchoiceplayer)
+                hudata["score"] = str(score)
+                hudata["content"] = description
+                hudata["card"] = ""
+                for i in cards:
+                    hudata["card"] += "{} ".format(i)
+                hudata["card"] = hudata["card"][:-1]
+                sendmsgtogether(self.room.user_list, self.server, hudata)
+                if len(self.room.getRemainingPlayers()) == 0:
+                    self.room.state = GameEndState(self.room, self.server)
+                    return
             self.room.state = WaitCardState(self.room, self.server)
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, maxchoiceplayer)
 
@@ -363,16 +381,36 @@ class WaitZimoState(State):
         super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
-        if reply["hu"] is None:
+        if int(reply["content"]) != 6:
             self.room.state = WaitCardState(self.room, self.server)
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
         else:
+            self.room.Hu(int(reply["room_id"]))
+            score = self.room.getScore(int(reply["room_id"]))
+            description = self.room.getHuDiscription(int(reply["room_id"]))
+            cards = self.room.getAllCard(int(reply["room_id"]))
+            hudata["score"] = str(score)
+            hudata["content"] = description
+            hudata["card"] = ""
+            for i in cards:
+                hudata["card"] += "{} ".format(i)
+            hudata["card"] = hudata["card"][:-1]
+            sendmsgtogether(self.room.user_list, self.server, hudata)
+            if len(self.room.getRemainingPlayers()) == 0:
+                self.room.state = GameEndState(self.room, self.server)
+                return
             self.room.state = WaitCardState(self.room, self.server)
-            self.room.Hu(reply["room_id"])
-            # delete player
-            # 是否需要nextPlayer()?不需要的话可以直接结算然后结束游戏
             card = self.room.drawCard()
             sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(), card)
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
 
 
+class GameEndState(State):
+    def __str__(self):
+        return "----- Game End State -----"
+
+    def __init__(self, room, server):
+        super().__init__(room, server)
+
+    def ChangeToNextState(self, reply):
+        pass
