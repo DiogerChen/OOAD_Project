@@ -41,7 +41,7 @@ class Room:
         return self.user_list[player_id - 1].socket_id
 
     def createGame(self):
-        colleges = np.random.choice([1, 2, 3, 4, 5, 6], 2, True)
+        colleges = np.random.choice([2, 3, 4, 5, 6], 2, True)
         self.game = Game(colleges[0], colleges[1])
         return colleges
 
