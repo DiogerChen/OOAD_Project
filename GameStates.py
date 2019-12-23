@@ -208,7 +208,7 @@ class WaitCardState(State):
     def ChangeToNextState(self, reply):
         # Tell everyone what play
         if reply["type"] == "playcard":
-            if reply["content"] != -1:
+            if int(reply["content"]) != -1:
                 self.room.playCard(int(reply["content"]))
                 sendPlayData(self.room.user_list, self.server, reply["room"], reply["room_id"], reply["content"])
             else:
