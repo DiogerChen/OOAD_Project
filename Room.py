@@ -81,8 +81,6 @@ class Room:
         return self.game.current_player.player_id
 
     def nextPlayer(self):
-        print(self.game.current_player)
-        print(self.game.remaining_player_list)
         index = self.game.remaining_player_list.index(self.game.current_player)
         if index == len(self.game.remaining_player_list) - 1:
             self.game.current_player = self.game.remaining_player_list[0]
@@ -142,7 +140,9 @@ class Room:
         self.nextPlayer()
 
     def playRandomCard(self):
-        return self.game.current_player.discardRandomCard().card_id
+        result = self.game.current_player.discardRandomCard().card_id
+        self.nextPlayer()
+        return result
 
     def getRemainingPlayers(self):
         result = []
@@ -240,9 +240,13 @@ class Room:
         player = self.game.id_to_player[player_id]
         player.huCalculator.calculate()
         self.earlyHu(player)
+        self.game.current_player=player
         if len(self.game.remaining_player_list) > 1:
+            print(self.getCurrentPlayer(),'!!')
             self.nextPlayer()
+            print(self.getCurrentPlayer(),'!!!')
             self.game.remaining_player_list.remove(player)
+            print(self.getCurrentPlayer(), '!!!!')
 
     def getScore(self, player_id):
         player = self.game.id_to_player[player_id]

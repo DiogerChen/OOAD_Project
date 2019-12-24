@@ -52,10 +52,12 @@ class Game:
                 self.deck.remove(c)
 
     def popCard(self):
-        if len(self.deck) > 0:
+        return self.deck.pop(0)
+
+        '''if len(self.deck) > 0:
             return self.deck.pop(random.randint(0, len(self.deck) - 1))
         else:
-            return None
+            return None'''
 
     def drawCard(self):
         card = self.popCard()
