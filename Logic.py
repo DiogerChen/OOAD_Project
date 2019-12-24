@@ -43,13 +43,13 @@ class Game:
                     id_counter += 1
         for t in zi_pai:
             for i in range(4):
+                if t == zi_pai[no_college1 - 1] or t == zi_pai[no_college2 - 1]:
+                    id_counter += 1
+                    continue
                 card = Card(t, 0, id_counter)
                 self.deck.append(card)
                 self.id_to_card[id_counter] = card
                 id_counter += 1
-        for c in self.deck:
-            if c.card_type == zi_pai[no_college1 - 1] or c.card_type == zi_pai[no_college2 - 1]:
-                self.deck.remove(c)
 
     def popCard(self):
         return self.deck.pop(0)
