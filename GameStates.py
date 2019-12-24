@@ -123,7 +123,8 @@ class WaitSupervisorState(State):
             self.room.replies.append(reply)
         if len(self.room.replies) == 4:
             for c in self.room.replies:
-                self.room.supervisorchoice[c["room_id"]] = int(c["content"])
+                self.room.setCalculator(int(c["room_id"]), int(c["content"]), int(c["content"]))
+                self.room.supervisorchoice[int(c["room_id"])] = int(c["content"])
                 self.room.setCalculator(int(c["room_id"]), int(c["content"]), int(c["content"]))
 
             # get pairs of cards then go to next state
