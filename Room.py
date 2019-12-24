@@ -142,7 +142,9 @@ class Room:
         self.nextPlayer()
 
     def playRandomCard(self):
-        return self.game.current_player.discardRandomCard().card_id
+        result = self.game.current_player.discardRandomCard().card_id
+        self.nextPlayer()
+        return result
 
     def getRemainingPlayers(self):
         result = []
