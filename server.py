@@ -1,6 +1,7 @@
 # coding=utf-8
-import GameStates
+
 from Room import *
+from GameStates import *
 import socket
 import threading
 import json
@@ -33,7 +34,7 @@ class server:
                     print('connection closed')
                     return
                 if data["type"] == "mook":
-                    GameStates.sendmsgtogether(self.rooms[int(data["room"])].user_list, self, data)
+                    sendmsgtogether(self.rooms[int(data["room"])].user_list, self, data)
                 if data["type"] == "create":
                     roomid = random.randint(1000,9999)
                     self.rooms[roomid] = Room(roomid, self)
