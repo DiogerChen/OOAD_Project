@@ -42,6 +42,17 @@ def sendPlayData(userlist, server, room, player, card):
     playdata["card"] = str(card)
     sendmsgtogether(userlist, server, playdata)
 
+def logHandCard(room):
+    logstring = "\n"
+    for i in room.user_list:
+        logstring += "\n"
+        card = room.getHand(i.room_id)
+        for c in card:
+            logstring += str(c) + ' '
+    logstring += "\n"
+    print(logstring)
+    logging.debug(logstring)
+
 '''状态模式'''
 class State:
     def __str__(self):
@@ -199,17 +210,7 @@ class WaitPairChoiceState(State):
                         return
                     sendDrawCardData(self.room.user_list, self.server, self.room.room_id, 1, card)
 
-                    logstring = "\n"
-                    for i in self.room.user_list:
-                        logstring+="\n"
-                        card = self.room.getHand(i.room_id)
-                        for c in card:
-                            logstring += str(c) + ' '
-                    logstring += "\n"
-                    print(logstring)
-                    logging.debug(logstring)
-
-
+                    logHandCard(self.room)
                     self.room.state = WaitCardState(self.room, self.server)
                     sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
 
@@ -299,16 +300,7 @@ class WaitCardState(State):
                                               "chi2": None, "chi3": None, "peng": None, "gang": None, "hu": "0"}
                             self.server.send(int(i.socket_id), specialopedata)
                 else:
-                    logstring = "\n"
-                    for i in self.room.user_list:
-                        logstring+="\n"
-                        card = self.room.getHand(i.room_id)
-                        for c in card:
-                            logstring += str(c) + ' '
-                    logstring += "\n"
-                    print(logstring)
-                    logging.debug(logstring)
-
+                    logHandCard(self.room)
                     self.room.state = WaitCardState(self.room, self.server)
                     sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
 
@@ -342,19 +334,9 @@ class WaitSpecailReplyState(State):
                     self.room.state = WaitZimoState(self.room, self.server)
                     hurequest["room"] = str(self.room.room_id)
                     hurequest["room_id"] = str(self.room.getCurrentPlayer())
-                    self.server.send(self.room.user_list[self.room.getCurrentPlayer()].socket_id, hurequest)
+                    self.server.send(self.room.user_list[self.room.getCurrentPlayer()-1].socket_id, hurequest)
                 else:
-                    logstring = "\n"
-                    for i in self.room.user_list:
-                        logstring+="\n"
-                        card = self.room.getHand(i.room_id)
-                        for c in card:
-                            logstring += str(c) + ' '
-                    logstring += "\n"
-                    print(logstring)
-                    logging.debug(logstring)
-
-
+                    logHandCard(self.room)
                     self.room.state = WaitCardState(self.room, self.server)
                     sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                 return
@@ -425,18 +407,8 @@ class WaitSpecailReplyState(State):
                     sendDrawCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer(),
                                      card)
 
-            logstring = "\n"
-            for i in self.room.user_list:
-                logstring += "\n"
-                card = self.room.getHand(i.room_id)
-                for c in card:
-                    logstring += str(c) + ' '
-            logstring += "\n"
-            print(logstring)
-            logging.debug(logstring)
-
+            logHandCard(self.room)
             self.room.state = WaitCardState(self.room, self.server)
-
             sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
 
 
@@ -454,16 +426,7 @@ class WaitZimoState(State):
             for i in self.room.replies:
                 if int(i["room_id"]) == self.room.getCurrentPlayer():
                     if int(i["content"]) != 6:
-                        logstring = "\n"
-                        for i in self.room.user_list:
-                            logstring += "\n"
-                            card = self.room.getHand(i.room_id)
-                            for c in card:
-                                logstring += str(c) + ' '
-                        logstring += "\n"
-                        print(logstring)
-                        logging.debug(logstring)
-
+                        logHandCard(self.room)
                         self.room.state = WaitCardState(self.room, self.server)
                         sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                     else:
@@ -485,16 +448,7 @@ class WaitZimoState(State):
                             self.room.state = GameEndState(self.room, self.server)
                             return
 
-                        logstring = "\n"
-                        for i in self.room.user_list:
-                            logstring += "\n"
-                            card = self.room.getHand(i.room_id)
-                            for c in card:
-                                logstring += str(c) + ' '
-                        logstring += "\n"
-                        print(logstring)
-                        logging.debug(logstring)
-
+                        logHandCard(self.room)
                         self.room.state = WaitCardState(self.room, self.server)
                         card = self.room.drawCard()
                         if card is None:
