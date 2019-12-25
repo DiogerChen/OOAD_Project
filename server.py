@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import GameStates
 from Room import *
 import socket
 import threading
@@ -12,7 +12,7 @@ import time
 
 
 class server:
-    serverName = '10.21.73.49'
+    serverName = '10.21.58.251'
     serverPort = 5555
     client = []
     rooms = {}
@@ -32,6 +32,8 @@ class server:
                     clientsock.close()
                     print('connection closed')
                     return
+                if data["type"] == "mook":
+                    GameStates.sendmsgtogether(self.rooms[int(data["room"])].user_list, self, data)
                 if data["type"] == "create":
                     roomid = random.randint(1000,9999)
                     self.rooms[roomid] = Room(roomid, self)
@@ -69,6 +71,7 @@ class server:
         data = json.dumps(data)
         print("Server send: " + str(data))
         logging.debug("Server send: " + str(data))
+        print("who: ",who)
         self.client[int(who)-1].send(data.encode('utf-8'))
         time.sleep(0.05)    # Unity是逐帧更新，发包间隔过短很有可能会让前端收不到消息
 

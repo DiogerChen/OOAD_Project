@@ -52,12 +52,11 @@ class Game:
                 id_counter += 1
 
     def popCard(self):
-        return self.deck.pop(0)
-
-        '''if len(self.deck) > 0:
-            return self.deck.pop(random.randint(0, len(self.deck) - 1))
+        if len(self.deck) > 0:
+            return self.deck.pop(0)
+            # return self.deck.pop(random.randint(0, len(self.deck) - 1))
         else:
-            return None'''
+            return None
 
     def drawCard(self):
         card = self.popCard()
