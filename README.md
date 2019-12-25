@@ -18,6 +18,7 @@
 - [server.py](https://github.com/DiogerChen/OOAD_Project/blob/master/server.py)
     - [Room.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Room.py)
         - [GameStates.py](https://github.com/DiogerChen/OOAD_Project/blob/master/GameStates.py)
+        - [HuCalculator.py](https://github.com/DiogerChen/OOAD_Project/blob/master/HuCalculator.py)
         - [Logic.py](https://github.com/DiogerChen/OOAD_Project/blob/master/Logic.py)
         - [User.py](https://github.com/DiogerChen/OOAD_Project/blob/master/User.py)
 
