@@ -344,21 +344,21 @@ class WaitSpecailReplyState(State):
                     sendAskCardData(self.room.user_list, self.server, self.room.room_id, self.room.getCurrentPlayer())
                 return
             elif maxchoice == 1:
-                self.room.Chi(maxchoiceplayer, self.room.lastcardid, 0)
+                self.room.Chi(maxchoiceplayer, 0, self.room.lastcardid)
                 chicards = self.room.cheackallresult[maxchoiceplayer-1][1][0]
                 cpgdata["card"] = "{} {} {}".format(chicards[0], chicards[1], chicards[2])
                 cpgdata["room"] = str(self.room.room_id)
                 cpgdata["player"] = str(maxchoiceplayer)
                 sendmsgtogether(self.room.user_list, self.server, cpgdata)
             elif maxchoice == 2:
-                self.room.Chi(maxchoiceplayer, self.room.lastcardid, 1)
+                self.room.Chi(maxchoiceplayer, 1, self.room.lastcardid)
                 chicards = self.room.cheackallresult[maxchoiceplayer-1][1][1]
                 cpgdata["card"] = "{} {} {}".format(chicards[0], chicards[1], chicards[2])
                 cpgdata["room"] = str(self.room.room_id)
                 cpgdata["player"] = str(maxchoiceplayer)
                 sendmsgtogether(self.room.user_list, self.server, cpgdata)
             elif maxchoice == 3:
-                self.room.Chi(maxchoiceplayer, self.room.lastcardid, 2)
+                self.room.Chi(maxchoiceplayer, 2, self.room.lastcardid)
                 chicards = self.room.cheackallresult[maxchoiceplayer-1][1][2]
                 cpgdata["card"] = "{} {} {}".format(chicards[0], chicards[1], chicards[2])
                 cpgdata["room"] = str(self.room.room_id)
