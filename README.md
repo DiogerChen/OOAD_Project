@@ -3,7 +3,7 @@
 ## 介绍
 - 一个使用Python搭建的，利用Socket通讯，应用于课程面向对象设计基础Project麻将游戏的简易多线程服务器
 - 主要逻辑判断均在该服务器上进行，并且使用状态模式更新游戏进度
-- 前端链接: [SUSTechMahjong](https://github.com/Pino444/SUSTechMahjong)
+- 前端链接: 喜迎[SUSTechMahjong v1.0](https://github.com/Pino444/SUSTechMahjong)发布！！！
 
 ## 环境
 - Python 3.7
@@ -36,14 +36,17 @@
 - [MsgContent_v2.0.md](https://github.com/DiogerChen/OOAD_Project/blob/master/MsgContent_v2.0.md)  
 目前作为参考的前后端通信规则文档
 
+- [导师和技能.txt](https://github.com/DiogerChen/OOAD_Project/blob/master/%E5%AF%BC%E5%B8%88%E5%92%8C%E6%8A%80%E8%83%BD.txt)
+介绍导师和技能作用和分数计算方式的文档
+
 - ~~[MsgContent.md](https://github.com/DiogerChen/OOAD_Project/blob/master/MsgContent.md)~~  
-已经弃用的第一代文档，在制定目前使用的文档时作为重要参考
+已经弃用的第一代文档，在制定目前使用的通信规则文档时作为重要参考
 
 
 ## 服务器端实现清单
  - [x] 房间的创建，加入，以及房间内人员情况(准备，离开)的实时更新
  - [x] 导师选择环节
  - [x] 积分选课环节
- - [ ] 正常打牌环节(等待测试)
+ - [x] 正常打牌环节
  - [x] 创建日志文件，记录服务器与客户端之间通讯内容以便于Debug
- - [ ] 优化代码结构
+ - [ ] 重构/优化代码结构(尚未完全完成)
