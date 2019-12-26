@@ -130,6 +130,8 @@ class Room:
 
     def drawCard(self):
         card = self.game.popCard()
+        if card is None:
+            return None
         self.game.current_player.recieveCard(card)
         return card.card_id
 
@@ -146,7 +148,7 @@ class Room:
 
     def getRemainingPlayers(self):
         result = []
-        for player in self.game.original_player_list:
+        for player in self.game.remaining_player_list:
             result.append(player.player_id)
         return result
 
@@ -247,6 +249,9 @@ class Room:
             print(self.getCurrentPlayer(),'!!!')
             self.game.remaining_player_list.remove(player)
             print(self.getCurrentPlayer(), '!!!!')
+        else:
+            print('last player is removed')
+            self.game.remaining_player_list.remove(player)
 
     def getScore(self, player_id):
         player = self.game.id_to_player[player_id]

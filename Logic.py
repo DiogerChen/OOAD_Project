@@ -53,8 +53,8 @@ class Game:
 
     def popCard(self):
         if len(self.deck) > 0:
-            return self.deck.pop(0)
-            # return self.deck.pop(random.randint(0, len(self.deck) - 1))
+            # return self.deck.pop(0)
+            return self.deck.pop(random.randint(0, len(self.deck) - 1))
         else:
             return None
 
@@ -204,6 +204,8 @@ class Player:
                 self.expose_area.append(choices[2][2])
             return True
         else:
+            print('unchiable!')
+            print(chiable,choices)
             return False
 
     def checkPeng(self, discard):

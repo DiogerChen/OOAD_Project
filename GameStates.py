@@ -313,7 +313,8 @@ class WaitSpecailReplyState(State):
         super().__init__(room, server)
 
     def ChangeToNextState(self, reply):
-        self.room.replies.append(reply)
+        if reply["type"] == "opereply":
+            self.room.replies.append(reply)
         if len(self.room.replies) == 4:
             maxchoiceplayer = 0
             maxchoice = 0
@@ -335,6 +336,12 @@ class WaitSpecailReplyState(State):
                     hurequest["room"] = str(self.room.room_id)
                     hurequest["room_id"] = str(self.room.getCurrentPlayer())
                     self.server.send(self.room.user_list[self.room.getCurrentPlayer()-1].socket_id, hurequest)
+                    for i in self.room.user_list:
+                        if i is not None and i.room_id != self.room.getCurrentPlayer():
+                            specialopedata = {"type": "specialope", "room": str(self.room.room_id),
+                                              "room_id": str(i.room_id), "chi1": None,
+                                              "chi2": None, "chi3": None, "peng": None, "gang": None, "hu": "0"}
+                            self.server.send(int(i.socket_id), specialopedata)
                 else:
                     logHandCard(self.room)
                     self.room.state = WaitCardState(self.room, self.server)
@@ -440,10 +447,13 @@ class WaitZimoState(State):
                         hudata["player"] = self.room.user_list[int(reply["room_id"]) - 1].name
                         hudata["content"] = description
                         hudata["card"] = ""
-                        for i in cards:
-                            hudata["card"] += "{} ".format(i)
+                        for c in cards:
+                            hudata["card"] += "{} ".format(c)
                         hudata["card"] = hudata["card"][:-1]
                         sendmsgtogether(self.room.user_list, self.server, hudata)
+
+
+                        print("Remain Player: ", len(self.room.getRemainingPlayers()))
                         if len(self.room.getRemainingPlayers()) == 0:
                             self.room.state = GameEndState(self.room, self.server)
                             return
@@ -465,17 +475,17 @@ class GameEndState(State):
 
     def __init__(self, room, server):
         super().__init__(room, server)
+        self.room.orders = []
 
         # 例: {"type": "end", "room": "8", "room_id": "2", "player": "c a b d", "score": "1000 800 790 20"}
-        scoredict = {}
+        scoredict = {1: None, 2: None, 3: None, 4: None}
         for i in range(1, 5):
             scoredict[i] = self.room.getScore(i)
-        self.room.orders = []
         self.room.orders = sorted(scoredict.items(), key=lambda e: e[1], reverse=True)
-        enddata["player"] = "{} {} {} {}".format(self.room.user_list[self.room.orders[0][0]].name,
-                                                 self.room.user_list[self.room.orders[1][0]].name,
-                                                 self.room.user_list[self.room.orders[2][0]].name,
-                                                 self.room.user_list[self.room.orders[3][0]].name)
+        enddata["player"] = "{} {} {} {}".format(self.room.user_list[self.room.orders[0][0]-1].name,
+                                                 self.room.user_list[self.room.orders[1][0]-1].name,
+                                                 self.room.user_list[self.room.orders[2][0]-1].name,
+                                                 self.room.user_list[self.room.orders[3][0]-1].name)
         enddata["score"] = "{} {} {} {}".format(self.room.orders[0][1],
                                                 self.room.orders[1][1],
                                                 self.room.orders[2][1],
